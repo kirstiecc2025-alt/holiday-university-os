@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="Holiday University">
   <title>Holiday University</title>
   <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
 
@@ -174,6 +175,23 @@ textarea { min-height: 115px; padding: 13px; line-height: 1.55; resize: vertical
 .check-item input { width: 19px; height: 19px; accent-color: var(--faculty); }
 .notes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .notes-grid .wide { grid-column: 1 / -1; }
+.ink-toolbar { position: relative; z-index: 7; display: flex; flex-wrap: wrap; gap: 7px; align-items: center; margin: 0 0 14px; padding: 9px; border: 1px solid #d7c9b5; border-radius: 10px; background: #f4ecdf; }
+.ink-toolbar button { min-height: 38px; padding: 7px 10px; color: var(--ink); border: 1px solid #cbbca6; border-radius: 7px; background: #fffaf3; cursor: pointer; }
+.ink-toolbar button.active { color: #fff; border-color: var(--faculty); background: var(--faculty); }
+.ink-toolbar .ink-colour { width: 32px; min-height: 32px; padding: 0; border: 3px solid #fff; border-radius: 50%; background: var(--swatch); box-shadow: 0 0 0 1px #aa9c88; }
+.ink-toolbar .ink-colour.active { box-shadow: 0 0 0 3px var(--faculty); }
+.ink-help { flex: 1 1 100%; margin: 0; color: #71665d; font-size: 12px; }
+.annotation-stage { position: relative; min-height: 180px; }
+.annotation-content { position: relative; z-index: 1; }
+.ink-canvas { display: block; width: 100%; border: 1px dashed #bfae94; border-radius: 9px; background: rgba(255,255,255,.42); touch-action: none; }
+.annotation-canvas { position: absolute; z-index: 4; inset: 0; height: 100%; border: 0; border-radius: 0; background: transparent; pointer-events: none; touch-action: pan-y; }
+.annotation-stage.ink-enabled .annotation-canvas { pointer-events: auto; touch-action: none; }
+.annotation-stage.ink-hidden .annotation-canvas, .ink-pad.ink-hidden .ink-canvas { opacity: 0; }
+.ink-pad { margin-top: 11px; padding: 12px; border: 1px solid #d7c9b5; border-radius: 10px; background: rgba(242,234,220,.62); }
+.ink-pad h4 { margin: 0 0 4px; font-size: 17px; }
+.ink-pad > p { margin: 0 0 10px; color: #71665d; font-size: 12px; }
+.ink-pad .ink-toolbar { margin-bottom: 9px; padding: 7px; }
+.ink-pad canvas { height: 180px; }
 
 .entry-list { display: grid; gap: 10px; margin-top: 20px; }
 .entry { padding: 16px; border-left: 3px solid var(--gold); background: rgba(255,252,247,.75); }
@@ -241,7 +259,7 @@ body.focus-mode .focus-exit { display: block; }
 }
 
 @media print {
-  .sidebar, .mobile-header, .mobile-nav, .button-row, .tabs, .side-card, .back-link { display: none !important; }
+  .sidebar, .mobile-header, .mobile-nav, .button-row, .tabs, .side-card, .back-link, .ink-toolbar { display: none !important; }
   main { margin: 0; padding: 20px; background: #fff; }
   .card, .reading-panel { box-shadow: none; background: #fff; }
 }
@@ -452,11 +470,38 @@ if(__exports != exports)module.exports = exports;return module.exports}));
         surprise: "",
         notes: "",
         passport: "",
+        ink: {},
         lastVisited: null,
         visits: 0
       };
     }
+    if (!state.progress[courseId].ink) state.progress[courseId].ink = {};
     return state.progress[courseId];
+  }
+
+  const inkColours = ["#3d302b", "#8f3d35", "#295b73", "#4d6843"];
+  const inkSettings = {};
+
+  function inkState(surface, overlay = false) {
+    return inkSettings[surface] || (inkSettings[surface] = { tool: "pen", colour: inkColours[0], enabled: !overlay, visible: true });
+  }
+
+  function renderInkToolbar(surface, overlay = false) {
+    const setting = inkState(surface, overlay);
+    return `<div class="ink-toolbar" data-ink-toolbar="${escapeHtml(surface)}">
+      ${overlay ? `<button type="button" data-ink-action="toggle" class="${setting.enabled ? "active" : ""}">${setting.enabled ? "Finish ink" : "Annotate"}</button>` : ""}
+      <button type="button" data-ink-tool="pen" class="${setting.tool === "pen" ? "active" : ""}">Pen</button>
+      <button type="button" data-ink-tool="highlighter" class="${setting.tool === "highlighter" ? "active" : ""}">Highlighter</button>
+      <button type="button" data-ink-tool="eraser" class="${setting.tool === "eraser" ? "active" : ""}">Eraser</button>
+      ${inkColours.map(colour => `<button type="button" class="ink-colour ${setting.colour === colour ? "active" : ""}" style="--swatch:${colour}" data-ink-colour="${colour}" aria-label="Choose ink colour"></button>`).join("")}
+      <button type="button" data-ink-action="undo">Undo</button><button type="button" data-ink-action="visibility">${setting.visible ? "Hide ink" : "Show ink"}</button><button type="button" data-ink-action="clear">Clear</button>
+      <p class="ink-help">Apple Pencil or mouse draws. A finger still scrolls the page.</p>
+    </div>`;
+  }
+
+  function renderInkPad(key, title) {
+    const surface = `answer:${key}`;
+    return `<section class="ink-pad" data-ink-container="${surface}"><h4>${escapeHtml(title)}</h4><p>Write freely here with Apple Pencil. Your handwriting is saved separately from typed text.</p>${renderInkToolbar(surface)}<canvas class="ink-canvas" data-ink-surface="${surface}" aria-label="${escapeHtml(title)} handwriting area"></canvas></section>`;
   }
 
   function coursePercent(courseId) {
@@ -518,6 +563,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     document.title = state.currentView === "course" && courseById[state.currentCourse]
       ? `${courseById[state.currentCourse].code} ${courseById[state.currentCourse].title} — Holiday University`
       : "Holiday University";
+    requestAnimationFrame(initInkCanvases);
   }
 
   function todayRecommendation() {
@@ -636,7 +682,8 @@ if(__exports != exports)module.exports = exports;return module.exports}));
           ${routeOrder.map(key => `<button class="route-button ${route === key ? "selected" : ""}" data-route="${key}"><strong>${escapeHtml(course.routes[key].label)}</strong><small>${key === "glimmer" ? "2–10 minutes" : key === "tea" ? "20–30 minutes" : key === "half" ? "60–120 minutes" : "untimed"}</small></button>`).join("")}
         </div>
         <div class="route-description"><strong>Your route:</strong> ${escapeHtml(course.routes[route].description)}</div>
-        <div class="field" style="margin-top:16px"><label for="doorAnswer">Your answer at the door</label><textarea id="doorAnswer" data-course-field="doorAnswer" placeholder="One sentence is enough…">${escapeHtml(progress.doorAnswer)}</textarea></div>
+        <div class="field" style="margin-top:16px"><label for="doorAnswer">Your answer at the door</label><textarea id="doorAnswer" data-course-field="doorAnswer" placeholder="Type, dictate, or use Apple Pencil Scribble…">${escapeHtml(progress.doorAnswer)}</textarea></div>
+        ${renderInkPad("doorAnswer", "Or answer by hand")}
       </section>
       <section class="milestone-wrap" aria-label="Course progress">
         <div class="section-heading"><h3>Your visit</h3><span>${percent}% explored</span></div>
@@ -647,7 +694,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
         ${[["lecture","Core Lecture"],["archive","Archive Room"],["library","Grand Library"],["field","Field Gate"],["notes","My Discovery"]].map(([key,label]) => `<button class="tab ${tab === key ? "active" : ""}" data-tab="${key}">${label}</button>`).join("")}
       </nav>
       <div class="course-body">
-        <article class="reading-panel">${tabContent}</article>
+        <article class="reading-panel">${renderInkToolbar(`annotation:${tab}`, true)}<div class="annotation-stage ${inkState(`annotation:${tab}`, true).enabled ? "ink-enabled" : ""} ${inkState(`annotation:${tab}`, true).visible ? "" : "ink-hidden"}" data-ink-container="annotation:${tab}"><div class="annotation-content">${tabContent}</div><canvas class="ink-canvas annotation-canvas" data-ink-surface="annotation:${tab}" aria-label="Course-page annotation layer"></canvas></div></article>
         <aside class="side-card">
           <p class="eyebrow">Course compass</p>
           <h3>${escapeHtml(course.question)}</h3>
@@ -669,13 +716,13 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       return `<p class="eyebrow">Grand Library</p><h2>Open a door</h2><p>You do not need every resource. One thoughtfully chosen door is enough.</p><div class="resource-list">${course.resources.map(resource => `<a class="resource" href="${escapeHtml(resource.url)}" target="_blank" rel="noopener noreferrer" data-resource-open="${course.id}"><span class="resource-type">${escapeHtml(resource.type)}</span><strong>${escapeHtml(resource.title)}</strong><span aria-hidden="true">↗</span></a>`).join("")}</div><h2>Rabbit-hole map</h2><ul>${course.rabbitHoles.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>${markdown(course.library)}<div class="button-row"><button class="btn btn-primary" data-tab="field">Continue to the Field Gate</button></div>`;
     }
     if (tab === "field") {
-      return `<p class="eyebrow">Faculty Expedition</p><h2>Take the question into the world</h2><p>${escapeHtml(course.expedition)}</p>${markdown(course.fieldGate)}<h3>Field questions</h3><div class="check-list">${course.fieldQuestions.map((question, index) => `<label class="check-item"><input type="checkbox" data-field-question="${index}" ${progress.fieldAnswers?.[index] ? "checked" : ""}><span>${escapeHtml(question)}</span></label>`).join("")}</div>${markdown(course.fieldArchive)}<div class="button-row"><button class="btn btn-primary" data-mark-and-tab="expedition:notes">Mark expedition complete & record discovery</button></div>`;
+      return `<p class="eyebrow">Faculty Expedition</p><h2>Take the question into the world</h2><p>${escapeHtml(course.expedition)}</p>${markdown(course.fieldGate)}<h3>Field questions</h3><div class="check-list">${course.fieldQuestions.map((question, index) => `<label class="check-item"><input type="checkbox" data-field-question="${index}" ${progress.fieldAnswers?.[index] ? "checked" : ""}><span>${escapeHtml(question)}</span></label>`).join("")}</div>${renderInkPad("fieldNotes", "Handwritten field notes")}${markdown(course.fieldArchive)}<div class="button-row"><button class="btn btn-primary" data-mark-and-tab="expedition:notes">Mark expedition complete & record discovery</button></div>`;
     }
     return `<p class="eyebrow">My visit</p><h2>What changed?</h2><div class="notes-grid">
-      <div class="field"><label for="thoughtBefore">What I thought before</label><textarea id="thoughtBefore" data-course-field="thoughtBefore">${escapeHtml(progress.thoughtBefore)}</textarea></div>
-      <div class="field"><label for="surprise">What surprised or contradicted me</label><textarea id="surprise" data-course-field="surprise">${escapeHtml(progress.surprise)}</textarea></div>
-      <div class="field wide"><label for="courseNotes">Field notes and connections</label><textarea id="courseNotes" data-course-field="notes" placeholder="Scribble, type, dictate or use Apple Pencil…">${escapeHtml(progress.notes)}</textarea></div>
-      <div class="field wide"><label for="passport">One sentence for my Academic Passport</label><textarea id="passport" data-course-field="passport" placeholder="The sentence you want to carry forward…">${escapeHtml(progress.passport)}</textarea></div>
+      <div class="field"><label for="thoughtBefore">What I thought before</label><textarea id="thoughtBefore" data-course-field="thoughtBefore">${escapeHtml(progress.thoughtBefore)}</textarea>${renderInkPad("thoughtBefore", "Write this answer by hand")}</div>
+      <div class="field"><label for="surprise">What surprised or contradicted me</label><textarea id="surprise" data-course-field="surprise">${escapeHtml(progress.surprise)}</textarea>${renderInkPad("surprise", "Write this answer by hand")}</div>
+      <div class="field wide"><label for="courseNotes">Field notes and connections</label><textarea id="courseNotes" data-course-field="notes" placeholder="Type, dictate, or use Apple Pencil Scribble…">${escapeHtml(progress.notes)}</textarea>${renderInkPad("notes", "Handwritten notes and connections")}</div>
+      <div class="field wide"><label for="passport">One sentence for my Academic Passport</label><textarea id="passport" data-course-field="passport" placeholder="The sentence you want to carry forward…">${escapeHtml(progress.passport)}</textarea>${renderInkPad("passport", "Write your passport sentence by hand")}</div>
     </div><div class="button-row" style="margin-top:18px"><button class="btn btn-primary" data-save-discovery="${course.id}">Record this visit</button><button class="btn" data-commonplace-from-course="${course.id}">Send to Commonplace Book</button></div>`;
   }
 
@@ -778,7 +825,118 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     saveState();
   }
 
+  function inkRecords(surface) {
+    const progress = progressFor(state.currentCourse);
+    return progress.ink[surface] || (progress.ink[surface] = []);
+  }
+
+  function findInkElement(attribute, surface) {
+    return [...document.querySelectorAll(`[${attribute}]`)].find(element => element.getAttribute(attribute) === surface);
+  }
+
+  function drawInk(canvas) {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    inkRecords(canvas.dataset.inkSurface).forEach(stroke => {
+      if (!stroke.points?.length) return;
+      ctx.save();
+      ctx.globalCompositeOperation = stroke.tool === "eraser" ? "destination-out" : "source-over";
+      ctx.globalAlpha = stroke.tool === "highlighter" ? .24 : 1;
+      ctx.strokeStyle = stroke.colour;
+      ctx.lineWidth = stroke.tool === "highlighter" ? 18 : stroke.tool === "eraser" ? 24 : 2.8;
+      ctx.lineCap = "round"; ctx.lineJoin = "round";
+      ctx.beginPath();
+      stroke.points.forEach((point, index) => {
+        const x = point.x * rect.width, y = point.y * rect.height;
+        if (!index) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      if (stroke.points.length === 1) ctx.lineTo(stroke.points[0].x * rect.width + .1, stroke.points[0].y * rect.height + .1);
+      ctx.stroke(); ctx.restore();
+    });
+  }
+
+  function sizeInkCanvas(canvas) {
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const width = Math.round(rect.width * ratio), height = Math.round(rect.height * ratio);
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width; canvas.height = height;
+      canvas.getContext("2d")?.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+    drawInk(canvas);
+  }
+
+  function initInkCanvases() {
+    if (state.currentView !== "course") return;
+    document.querySelectorAll("[data-ink-surface]").forEach(canvas => {
+      sizeInkCanvas(canvas);
+      if (window.ResizeObserver) new ResizeObserver(() => sizeInkCanvas(canvas)).observe(canvas);
+      let stroke = null;
+      const point = event => {
+        const rect = canvas.getBoundingClientRect();
+        return { x: Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)), y: Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height)), p: event.pressure || .5 };
+      };
+      canvas.addEventListener("pointerdown", event => {
+        if (event.pointerType === "touch") return;
+        const setting = inkState(canvas.dataset.inkSurface, canvas.classList.contains("annotation-canvas"));
+        if (canvas.classList.contains("annotation-canvas") && !setting.enabled) return;
+        event.preventDefault(); canvas.setPointerCapture?.(event.pointerId);
+        stroke = { tool: setting.tool, colour: setting.colour, points: [point(event)] };
+        inkRecords(canvas.dataset.inkSurface).push(stroke); drawInk(canvas);
+      });
+      canvas.addEventListener("pointermove", event => {
+        if (!stroke || (event.buttons === 0 && event.pointerType !== "pen")) return;
+        event.preventDefault(); stroke.points.push(point(event)); drawInk(canvas);
+      });
+      const finish = () => {
+        if (!stroke) return;
+        stroke = null;
+        const progress = progressFor(state.currentCourse);
+        if (canvas.dataset.inkSurface === "answer:doorAnswer") progress.milestones.question = true;
+        progress.lastVisited = new Date().toISOString();
+        saveState("Handwriting saved.");
+      };
+      canvas.addEventListener("pointerup", finish); canvas.addEventListener("pointercancel", finish);
+    });
+  }
+
+  function updateInkToolbar(toolbar, surface) {
+    const setting = inkState(surface, surface.startsWith("annotation:"));
+    toolbar.querySelectorAll("[data-ink-tool]").forEach(button => button.classList.toggle("active", button.dataset.inkTool === setting.tool));
+    toolbar.querySelectorAll("[data-ink-colour]").forEach(button => button.classList.toggle("active", button.dataset.inkColour === setting.colour));
+    const toggle = toolbar.querySelector('[data-ink-action="toggle"]');
+    if (toggle) { toggle.classList.toggle("active", setting.enabled); toggle.textContent = setting.enabled ? "Finish ink" : "Annotate"; }
+    const visibility = toolbar.querySelector('[data-ink-action="visibility"]');
+    if (visibility) visibility.textContent = setting.visible ? "Hide ink" : "Show ink";
+    const container = findInkElement("data-ink-container", surface);
+    container?.classList.toggle("ink-enabled", setting.enabled);
+    container?.classList.toggle("ink-hidden", !setting.visible);
+  }
+
   document.addEventListener("click", event => {
+    const inkToolbar = event.target.closest("[data-ink-toolbar]");
+    if (inkToolbar) {
+      const surface = inkToolbar.dataset.inkToolbar;
+      const setting = inkState(surface, surface.startsWith("annotation:"));
+      const tool = event.target.closest("[data-ink-tool]");
+      const colour = event.target.closest("[data-ink-colour]");
+      const action = event.target.closest("[data-ink-action]");
+      if (tool) setting.tool = tool.dataset.inkTool;
+      if (colour) { setting.colour = colour.dataset.inkColour; setting.tool = "pen"; }
+      if (action?.dataset.inkAction === "toggle") setting.enabled = !setting.enabled;
+      if (action?.dataset.inkAction === "visibility") setting.visible = !setting.visible;
+      if (action?.dataset.inkAction === "undo") inkRecords(surface).pop();
+      if (action?.dataset.inkAction === "clear" && inkRecords(surface).length && confirm("Clear all handwriting on this area?")) progressFor(state.currentCourse).ink[surface] = [];
+      updateInkToolbar(inkToolbar, surface);
+      const canvas = findInkElement("data-ink-surface", surface);
+      if (canvas) drawInk(canvas);
+      saveState();
+      return;
+    }
+
     const viewButton = event.target.closest("[data-view]");
     if (viewButton) return setView(viewButton.dataset.view);
 
@@ -839,7 +997,8 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     const saveDiscovery = event.target.closest("[data-save-discovery]");
     if (saveDiscovery) {
       const p = progressFor(saveDiscovery.dataset.saveDiscovery);
-      if (p.notes.trim() || p.surprise.trim() || p.passport.trim()) p.milestones.notes = true;
+      const handwrittenDiscovery = ["answer:thoughtBefore", "answer:surprise", "answer:notes", "answer:passport"].some(key => p.ink?.[key]?.length);
+      if (p.notes.trim() || p.surprise.trim() || p.passport.trim() || handwrittenDiscovery) p.milestones.notes = true;
       markVisited(saveDiscovery.dataset.saveDiscovery);
       saveState("Visit recorded in your Academic Passport.");
       return render();
