@@ -107,6 +107,23 @@ h3 { margin: 0 0 8px; font-size: 24px; }
 .mode-banner { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 24px; padding: 16px 20px; color: #f8f0e4; border: 1px solid #9f7c3d; border-radius: 13px; background: linear-gradient(125deg,#25201d,#46372a); }
 .mode-banner strong { font: 600 22px "Cormorant Garamond", serif; }
 .mode-banner span { color: #d4c7b5; font-size: 13px; }
+.dashboard-mode-switch { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:0 0 24px; padding:8px; border:1px solid #b99a5d; border-radius:14px; background:#25201d; box-shadow:var(--shadow); }
+.dashboard-mode-switch button { min-height:48px; padding:9px 12px; color:#d8ccbc; border:1px solid transparent; border-radius:9px; background:transparent; cursor:pointer; font-weight:700; }
+.dashboard-mode-switch button.active { color:#241f1c; border-color:#e0c580; background:#d7ba78; }
+.continue-card { margin-bottom:22px; border-color:#aa8b4f; background:linear-gradient(120deg,#fffaf0,#eee2cf); }
+.search-results { display:grid; gap:10px; }
+.search-result { width:100%; padding:17px; display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center; text-align:left; border:1px solid #d5c6b2; border-radius:11px; background:rgba(255,252,247,.8); cursor:pointer; }
+.search-result:hover { border-color:var(--gold); background:#fffaf1; }
+.search-kind { min-width:72px; color:#765d2c; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.bookmark-star { font-size:22px; color:#9a7a3d; }
+.blended-bridge { margin-top:18px; padding:18px; border:1px dashed #a88a4e; border-radius:12px; background:rgba(255,250,240,.72); }
+.custom-project-form { display:grid; gap:14px; }
+.custom-project-card { position:relative; min-height:220px; }
+.sticky-note { position:absolute; z-index:10; width:210px; min-height:150px; padding:10px; border:1px solid #b79449; border-radius:5px; background:#f7e6a7; box-shadow:0 10px 25px rgba(55,42,24,.22); transform:rotate(-1deg); pointer-events:auto; touch-action:none; }
+.sticky-note-head { display:flex; justify-content:space-between; gap:8px; align-items:center; margin-bottom:6px; cursor:grab; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.sticky-note textarea { min-height:105px; padding:6px; border:0; background:transparent; resize:none; touch-action:auto; }
+.sticky-note button { border:0; background:transparent; cursor:pointer; }
+.storage-status { display:flex; gap:10px; align-items:center; margin-top:12px; color:#5f6d55; font-size:12px; }
 .professional-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
 .professional-card { position: relative; min-height: 245px; text-align: left; cursor: pointer; }
 .professional-card .module-number { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 22px; color: #fff; border-radius: 50%; background: #476058; font: 600 18px "Cormorant Garamond",serif; }
@@ -275,6 +292,7 @@ body.focus-mode .focus-exit { display: block; }
   .dashboard-grid, .passport-summary { grid-template-columns: 1fr; }
   .faculty-grid { grid-template-columns: 1fr; }
   .professional-grid, .blended-grid { grid-template-columns: 1fr; }
+  .dashboard-mode-switch { grid-template-columns:1fr; }
   .faculty-card { min-height: 190px; }
   .course-header { padding: 26px 21px; }
   .course-header::after { display: none; }
@@ -298,6 +316,9 @@ body.focus-mode .focus-exit { display: block; }
   .sidebar, .mobile-header, .mobile-nav, .button-row, .tabs, .side-card, .back-link, .ink-toolbar, .full-page-ink { display: none !important; }
   main { margin: 0; padding: 20px; background: #fff; }
   .card, .reading-panel { box-shadow: none; background: #fff; }
+  .full-page-ink, .ink-toolbar, .back-link, .focus-exit, .mobile-header, .sidebar { display:none !important; }
+  main { margin:0; padding:0; }
+  .full-page-canvas, .sticky-note { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
 }
 
 </style>
@@ -317,6 +338,7 @@ body.focus-mode .focus-exit { display: block; }
         <button data-view="professional"><span>◆</span> Professional Studio</button>
         <button data-view="faculties"><span>⌘</span> Faculty Hall</button>
         <button data-view="catalogue"><span>☰</span> Course Registry</button>
+        <button data-view="search"><span>⌕</span> Search Academy</button>
         <button data-view="cabinet"><span>?</span> Curiosity Cabinet</button>
         <button data-view="commonplace"><span>✎</span> Commonplace Book</button>
         <button data-view="transcript"><span>◇</span> Academic Passport</button>
@@ -344,6 +366,7 @@ body.focus-mode .focus-exit { display: block; }
     <button data-view="professional">Professional</button>
     <button data-view="faculties">Faculties</button>
     <button data-view="catalogue">Courses</button>
+    <button data-view="search">Search Academy</button>
     <button data-view="cabinet">Cabinet</button>
     <button data-view="commonplace">Commonplace</button>
     <button data-view="transcript">Passport</button>
@@ -484,6 +507,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       {title:"Test comprehension, not admiration",text:"Ask someone to use the resource without coaching. Observe where they pause, misinterpret or search. Ask them to explain what they would do next. Revise the resource, then record owner, version, source links and a review date so it does not become confidently obsolete."}],tasks:["Define user, moment and single job","Create the shortest complete route","Add accessibility and recovery guidance","Test without rescuing and revise"],outputPrompt:"Create a reusable resource specification and first draft, including audience, purpose, structure, accessibility, test notes, owner, version and review date.",evidencePrompt:"Where did the user’s behaviour contradict your assumption about clarity?",workUse:"Publish or use the revised resource once, then schedule its first content review."}
   ];
   const STORAGE_KEY = "holiday-university-os-state-v1";
+  const RECOVERY_KEY = "lantern-academy-recovery-v2";
   const milestoneNames = {
     question: "Question answered",
     lecture: "Lecture read",
@@ -503,17 +527,24 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   let toastTimer = null;
 
   const defaults = {
-    version: 2,
+    version: 3,
     studyMode: "curiosity",
     currentView: "dashboard",
     currentCourse: null,
     currentProfessional: null,
+    currentCustomProject: null,
     currentTab: "lecture",
     selectedCapacity: "glimmer",
     catalogueFaculty: "all",
     catalogueQuery: "",
     progress: {},
     professionalProgress: {},
+    customProjects: [],
+    bookmarks: {},
+    stickyNotes: {},
+    searchQuery: "",
+    blendedConnection: "",
+    backupMeta: { lastExport: null, lastSaved: null },
     cabinet: [],
     commonplace: [],
     recent: [],
@@ -523,21 +554,27 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   let state = loadState();
 
   function freshDefaults() {
-    return { ...defaults, progress: {}, professionalProgress: {}, cabinet: [], commonplace: [], recent: [], matriculatedAt: new Date().toISOString() };
+    return { ...defaults, progress: {}, professionalProgress: {}, customProjects: [], bookmarks: {}, stickyNotes: {}, cabinet: [], commonplace: [], recent: [], backupMeta: { lastExport: null, lastSaved: null }, matriculatedAt: new Date().toISOString() };
   }
 
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      return saved ? { ...freshDefaults(), ...saved } : freshDefaults();
+      return saved ? { ...freshDefaults(), ...saved, version: defaults.version, backupMeta: { ...freshDefaults().backupMeta, ...(saved.backupMeta || {}) } } : freshDefaults();
     } catch (_) {
       return freshDefaults();
     }
   }
 
   function saveState(message) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    if (message) showToast(message);
+    state.backupMeta = state.backupMeta || {};
+    state.backupMeta.lastSaved = new Date().toISOString();
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (message) showToast(message);
+    } catch (_) {
+      showToast("This device is low on study storage. Export a backup now.");
+    }
   }
 
   function showToast(message) {
@@ -566,6 +603,12 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     };
     if (!state.professionalProgress[moduleId].ink) state.professionalProgress[moduleId].ink = {};
     return state.professionalProgress[moduleId];
+  }
+
+  function customProjectFor(projectId) {
+    const project = (state.customProjects || []).find(item => item.id === projectId);
+    if (project && !project.ink) project.ink = {};
+    return project;
   }
 
   function professionalPercent(moduleId) {
@@ -609,6 +652,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     const setting = inkState(surface, overlay);
     return `<div class="ink-toolbar" data-ink-toolbar="${escapeHtml(surface)}">
       ${overlay ? `<button type="button" data-ink-action="toggle" class="${setting.enabled ? "active" : ""}">${setting.enabled ? "Finish ink" : "Annotate"}</button>` : ""}
+      ${surface.includes("fullpage") ? `<button type="button" data-add-sticky="${escapeHtml(surface)}">＋ Sticky note</button>` : ""}
       <button type="button" data-ink-tool="pen" class="${setting.tool === "pen" ? "active" : ""}">Pen</button>
       <button type="button" data-ink-tool="highlighter" class="${setting.tool === "highlighter" ? "active" : ""}">Highlighter</button>
       <button type="button" data-ink-tool="eraser" class="${setting.tool === "eraser" ? "active" : ""}">Eraser</button>
@@ -621,6 +665,42 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   function renderInkPad(key, title) {
     const surface = `answer:${key}`;
     return `<section class="ink-pad" data-ink-container="${surface}"><h4>${escapeHtml(title)}</h4><p>Write freely here with Apple Pencil. Your handwriting is saved separately from typed text.</p>${renderInkToolbar(surface)}<canvas class="ink-canvas" data-ink-surface="${surface}" aria-label="${escapeHtml(title)} handwriting area"></canvas></section>`;
+  }
+
+  function stickyNotesFor(surface) {
+    state.stickyNotes = state.stickyNotes || {};
+    return state.stickyNotes[surface] || (state.stickyNotes[surface] = []);
+  }
+
+  function renderStickyNotes(surface) {
+    return stickyNotesFor(surface).map(note => `<section class="sticky-note" data-sticky="${note.id}" data-sticky-surface="${escapeHtml(surface)}" style="left:${note.x || 6}%;top:${note.y || 12}%"><div class="sticky-note-head"><span>Move note</span><button type="button" data-delete-sticky="${escapeHtml(surface)}:${note.id}" aria-label="Delete sticky note">×</button></div><textarea data-sticky-text="${escapeHtml(surface)}:${note.id}" placeholder="Write a note…">${escapeHtml(note.text || "")}</textarea></section>`).join("");
+  }
+
+  function initStickyNotes() {
+    document.querySelectorAll("[data-sticky]").forEach(note => {
+      const handle = note.querySelector(".sticky-note-head");
+      let drag = null;
+      handle?.addEventListener("pointerdown", event => {
+        if (event.target.closest("button")) return;
+        const parent = note.parentElement;
+        drag = { startX:event.clientX, startY:event.clientY, left:note.offsetLeft, top:note.offsetTop, width:parent.clientWidth, height:parent.scrollHeight };
+        handle.setPointerCapture?.(event.pointerId);
+        event.preventDefault();
+      });
+      handle?.addEventListener("pointermove", event => {
+        if (!drag) return;
+        const left = Math.max(0, Math.min(drag.width - note.offsetWidth, drag.left + event.clientX - drag.startX));
+        const top = Math.max(0, Math.min(drag.height - note.offsetHeight, drag.top + event.clientY - drag.startY));
+        note.style.left = `${left}px`; note.style.top = `${top}px`;
+      });
+      const finish = () => {
+        if (!drag) return;
+        const record = stickyNotesFor(note.dataset.stickySurface).find(item => item.id === note.dataset.sticky);
+        if (record) { record.x = Math.round(note.offsetLeft / note.parentElement.clientWidth * 1000) / 10; record.y = Math.round(note.offsetTop / note.parentElement.scrollHeight * 1000) / 10; }
+        drag = null; saveState("Sticky note moved.");
+      };
+      handle?.addEventListener("pointerup", finish); handle?.addEventListener("pointercancel", finish);
+    });
   }
 
   function coursePercent(courseId) {
@@ -669,11 +749,13 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     document.querySelectorAll(".primary-nav button").forEach(button => button.classList.toggle("active", button.dataset.view === state.currentView));
     const renderers = {
       dashboard: renderDashboard,
+      search: renderSearch,
       faculties: renderFaculties,
       catalogue: renderCatalogue,
       course: renderCourse,
       professional: renderProfessionalStudio,
       professionalCourse: renderProfessionalCourse,
+      customProject: renderCustomProject,
       cabinet: renderCabinet,
       commonplace: renderCommonplace,
       transcript: renderTranscript,
@@ -688,8 +770,10 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       ? `${courseById[state.currentCourse].code} ${courseById[state.currentCourse].title} — Lantern Academy`
       : state.currentView === "professionalCourse" && state.currentProfessional
         ? `${PROFESSIONAL_MODULES.find(item => item.id === state.currentProfessional)?.title || "Professional Studio"} — Lantern Academy`
-        : "Lantern Academy";
-    requestAnimationFrame(initInkCanvases);
+        : state.currentView === "customProject" && state.currentCustomProject
+          ? `${customProjectFor(state.currentCustomProject)?.title || "My Pathway"} — Lantern Academy`
+          : "Lantern Academy";
+    requestAnimationFrame(() => { initInkCanvases(); initStickyNotes(); });
   }
 
   function todayRecommendation() {
@@ -702,6 +786,14 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     if (state.studyMode === "professional") return renderProfessionalDashboard();
     if (state.studyMode === "blended") return renderBlendedDashboard();
     return renderCuriosityDashboard();
+  }
+
+  function dashboardModeSwitch() {
+    return `<div class="dashboard-mode-switch" role="group" aria-label="Choose study mode">
+      <button data-mode="curiosity" class="${state.studyMode === "curiosity" ? "active" : ""}">Curiosity<br><small>Follow wonder</small></button>
+      <button data-mode="professional" class="${state.studyMode === "professional" ? "active" : ""}">Professional<br><small>Build useful capability</small></button>
+      <button data-mode="blended" class="${state.studyMode === "blended" ? "active" : ""}">Blended<br><small>Take one of each</small></button>
+    </div>`;
   }
 
   function modeBanner(label, copy) {
@@ -720,7 +812,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     const active = PROFESSIONAL_MODULES.filter(module => state.professionalProgress[module.id]?.lastVisited && !state.professionalProgress[module.id]?.completed);
     const completed = PROFESSIONAL_MODULES.filter(module => state.professionalProgress[module.id]?.completed).length;
     const next = nextProfessionalModule();
-    return `<div class="page">${modeBanner("Professional Mode","Applied learning, real outputs and evidence you can carry into your work.")}
+    return `<div class="page">${dashboardModeSwitch()}${modeBanner("Professional Mode","Applied learning, real outputs and evidence you can carry into your work.")}
       ${pageHeader("Professional Base Camp","Build capability, then use it", "Choose a pathway, create the actual output and record what changed.", '<button class="btn" data-view="professional">Open Professional Studio</button>')}
       <section class="grid stats-grid"><div class="card stat"><span>Pathways available</span><strong>12</strong></div><div class="card stat"><span>In progress</span><strong>${active.length}</strong></div><div class="card stat"><span>Completed</span><strong>${completed}</strong></div><div class="card stat"><span>Outputs created</span><strong>${Object.values(state.professionalProgress).filter(p => p.output?.trim()).length}</strong></div></section>
       <section class="capacity-card"><p class="eyebrow">Best next move</p><h2>${escapeHtml(next.title)}</h2><p>${escapeHtml(next.summary)}</p><div class="professional-meta"><span class="tag">${escapeHtml(next.area)}</span><span class="tag">${escapeHtml(next.time)}</span><span class="tag priority-${professionalProgressFor(next.id).priority}">${escapeHtml(professionalProgressFor(next.id).priority)} priority</span></div><button class="btn btn-primary" data-professional="${next.id}">Continue pathway</button></section>
@@ -732,12 +824,13 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     const curiosity = todayRecommendation();
     const professional = nextProfessionalModule();
     const route = curiosity.routes[state.selectedCapacity];
-    return `<div class="page">${modeBanner("Blended Mode","One useful thread and one gloriously interesting thread. Both belong here.")}
+    return `<div class="page">${dashboardModeSwitch()}${modeBanner("Blended Mode","One useful thread and one gloriously interesting thread. Both belong here.")}
       ${pageHeader("The Crossing","Useful meets fascinating", "Choose either door—or take a little from both without creating homework debt.")}
       <div class="blended-grid">
         <section class="capacity-card" style="--faculty:${facultyColour(curiosity.faculty)}"><p class="eyebrow">Curiosity thread</p><h2>${escapeHtml(curiosity.code)} · ${escapeHtml(curiosity.title)}</h2><p>${escapeHtml(route.description)}</p><button class="btn btn-primary" data-course="${curiosity.id}" data-route="${state.selectedCapacity}">Follow curiosity</button></section>
         <section class="capacity-card"><p class="eyebrow">Professional thread</p><h2>${escapeHtml(professional.title)}</h2><p>${escapeHtml(professional.summary)}</p><div class="professional-meta"><span class="tag">${escapeHtml(professional.area)}</span><span class="tag">${escapeHtml(professional.time)}</span></div><button class="btn btn-primary" data-professional="${professional.id}">Make something useful</button></section>
       </div>
+      <section class="blended-bridge"><p class="eyebrow">The bridge between them</p><h3>What could this curiosity thread change about how you approach the useful one?</h3><textarea data-state-field="blendedConnection" placeholder="A connection, hunch or gloriously premature theory…">${escapeHtml(state.blendedConnection || "")}</textarea></section>
       <div class="section-heading"><h2>Choose today’s curiosity depth</h2></div><div class="capacity-options">${routeOrder.map(key => `<button class="capacity-option ${state.selectedCapacity === key ? "selected" : ""}" data-capacity="${key}"><strong>${escapeHtml(DATA.courses[0].routes[key].label)}</strong><small>${key === "glimmer" ? "2–10 min" : key === "tea" ? "20–30 min" : key === "half" ? "60–120 min" : "Untimed"}</small></button>`).join("")}</div>
     </div>`;
   }
@@ -750,9 +843,11 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     const recommendation = todayRecommendation();
     const recent = state.recent.map(id => courseById[id]).filter(Boolean).slice(0, 3);
     const route = recommendation.routes[state.selectedCapacity];
+    const continueCourse = recent[0];
     return `<div class="page">
-      ${modeBanner("Curiosity Mode","No grades, no guilt, no demand that every interesting door become productive.")}
+      ${dashboardModeSwitch()}${modeBanner("Curiosity Mode","No grades, no guilt, no demand that every interesting door become productive.")}
       ${pageHeader("Base Camp", "Welcome back, Explorer", "Choose the amount of curiosity that fits today. A glimmer counts as study.", '<button class="btn" data-view="catalogue">Browse all 48 courses</button>')}
+      ${continueCourse ? `<section class="card continue-card"><div class="section-heading" style="margin:0"><div><p class="eyebrow">Continue where you left off</p><h3>${escapeHtml(continueCourse.code)} · ${escapeHtml(continueCourse.title)}</h3><p class="muted">${coursePercent(continueCourse.id)}% explored · last room ${escapeHtml(state.currentTab || "lecture")}</p></div><button class="btn btn-primary" data-course="${continueCourse.id}" data-resume-course>Continue learning</button></div></section>` : ""}
       <section class="grid stats-grid" aria-label="University progress">
         <div class="card stat"><span>Courses visited</span><strong>${visited}<small class="muted"> / 48</small></strong></div>
         <div class="card stat"><span>Courses completed</span><strong>${complete}</strong></div>
@@ -816,10 +911,35 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   function renderProfessionalStudio() {
     const completed = PROFESSIONAL_MODULES.filter(module => state.professionalProgress[module.id]?.completed).length;
     return `<div class="page">${modeBanner("Professional Studio","Practical pathways for digital inclusion, learning design, systems, AI and consulting.")}
-      ${pageHeader("Professional Faculty","Applied learning pathways", "Each pathway contains its core reading, tasks, a real work output and CPD evidence.")}
+      ${pageHeader("Professional Faculty","Applied learning pathways", "Use a built-in pathway or create one around the work question actually in front of you.", '<button class="btn btn-primary" data-toggle-project-form>Create my own pathway</button>')}
+      <form id="customProjectForm" class="card custom-project-form" hidden style="margin-bottom:20px"><p class="eyebrow">New professional pathway</p><div class="field"><label for="projectTitle">Pathway title</label><input id="projectTitle" type="text" required placeholder="e.g. Build an accessible AI session"></div><div class="field"><label for="projectGoal">What should this help you do?</label><textarea id="projectGoal" required placeholder="A real capability, decision or output…"></textarea></div><div class="toolbar"><div class="field"><label for="projectPriority">Priority</label><select id="projectPriority"><option>low</option><option selected>medium</option><option>high</option></select></div><div class="field"><label for="projectDeadline">Useful by</label><input id="projectDeadline" type="date"></div><button class="btn btn-primary" type="submit" style="align-self:end">Create pathway</button></div></form>
       <section class="card" style="margin-bottom:22px"><div class="section-heading" style="margin:0"><div><p class="eyebrow">Professional record</p><h3>${completed} of 12 pathways completed</h3></div><button class="btn" data-view="transcript">Open Academy record</button></div></section>
+      ${(state.customProjects || []).length ? `<div class="section-heading"><h2>My pathways</h2></div><section class="grid professional-grid">${state.customProjects.map(renderCustomProjectCard).join("")}</section>` : ""}
+      <div class="section-heading"><h2>Academy pathways</h2></div>
       <section class="grid professional-grid">${PROFESSIONAL_MODULES.map(renderProfessionalCard).join("")}</section>
     </div>`;
+  }
+
+  function renderCustomProjectCard(project) {
+    const done = project.completed ? 100 : [project.output, project.evidence, project.notes].filter(value => value?.trim()).length * 25;
+    return `<button class="card professional-card custom-project-card" data-custom-project="${project.id}"><span class="module-number">✦</span><span class="faculty-meta">My pathway</span><h3>${escapeHtml(project.title)}</h3><p>${escapeHtml(project.goal)}</p><div class="professional-meta"><span class="tag priority-${project.priority}">${escapeHtml(project.priority)} priority</span>${project.deadline ? `<span class="tag">Due ${escapeHtml(new Date(`${project.deadline}T12:00:00`).toLocaleDateString("en-GB",{day:"numeric",month:"short"}))}</span>` : ""}</div><span class="progress-pill ${project.completed ? "complete" : ""}">${done}%</span></button>`;
+  }
+
+  function renderCustomProject() {
+    const project = (state.customProjects || []).find(item => item.id === state.currentCustomProject);
+    if (!project) return renderProfessionalStudio();
+    project.lastVisited = new Date().toISOString();
+    const pageSurface = `custom:${project.id}:fullpage`;
+    return `<div class="page professional-page annotation-stage full-page-annotation ${inkState(pageSurface, true).enabled ? "ink-enabled" : ""} ${inkState(pageSurface, true).visible ? "" : "ink-hidden"}" data-ink-container="${pageSurface}">
+      <div class="full-page-ink"><p>Full-page Pencil layer</p>${renderInkToolbar(pageSurface, true)}</div><button class="back-link" data-view="professional">← Return to Professional Studio</button>
+      <header class="professional-hero"><p class="eyebrow">My applied pathway</p><h1>${escapeHtml(project.title)}</h1><p class="lede" style="color:#e4dcd1">${escapeHtml(project.goal)}</p></header>
+      <div class="professional-layout"><article class="reading-panel"><p class="eyebrow">Shape the learning</p><h2>Build the route as you go</h2>
+        <div class="field"><label>Learning plan, resources and working steps</label><textarea data-custom-field="plan" placeholder="What do you need to understand, read, watch, test or ask?">${escapeHtml(project.plan || "")}</textarea></div>
+        <div class="field" style="margin-top:16px"><label>Work output</label><textarea data-custom-field="output" placeholder="Build or draft the actual useful thing here…">${escapeHtml(project.output || "")}</textarea></div>
+        <div class="field" style="margin-top:16px"><label>Evidence and reflection</label><textarea data-custom-field="evidence" placeholder="What changed, what worked, and what evidence do you have?">${escapeHtml(project.evidence || "")}</textarea></div>
+        <div class="field" style="margin-top:16px"><label>Notes and connections</label><textarea data-custom-field="notes">${escapeHtml(project.notes || "")}</textarea></div>
+      </article><aside class="professional-side"><section class="card"><p class="eyebrow">Plan the work</p><div class="field"><label>Priority</label><select data-custom-field="priority"><option value="low" ${project.priority === "low" ? "selected" : ""}>Low</option><option value="medium" ${project.priority === "medium" ? "selected" : ""}>Medium</option><option value="high" ${project.priority === "high" ? "selected" : ""}>High</option></select></div><div class="field" style="margin-top:12px"><label>Useful by</label><input type="date" data-custom-field="deadline" value="${escapeHtml(project.deadline || "")}"></div></section><div class="button-row">${bookmarkButton("custom", project.id)}<button class="btn" data-print-page>Export page / PDF</button></div><button class="btn ${project.completed ? "" : "btn-primary"}" data-custom-complete="${project.id}">${project.completed ? "✓ Completed — reopen" : "Complete pathway"}</button><button class="btn" data-delete-custom="${project.id}">Archive this pathway</button></aside></div>
+      ${renderStickyNotes(pageSurface)}<canvas class="ink-canvas annotation-canvas full-page-canvas" data-ink-surface="${pageSurface}" aria-label="Full custom-pathway annotation layer"></canvas></div>`;
   }
 
   function renderProfessionalCourse() {
@@ -845,16 +965,63 @@ if(__exports != exports)module.exports = exports;return module.exports}));
           <section class="card"><p class="eyebrow">Plan the work</p><div class="field"><label for="professionalPriority">Priority</label><select id="professionalPriority" data-professional-field="priority"><option value="low" ${p.priority === "low" ? "selected" : ""}>Low</option><option value="medium" ${p.priority === "medium" ? "selected" : ""}>Medium</option><option value="high" ${p.priority === "high" ? "selected" : ""}>High</option></select></div><div class="field" style="margin-top:12px"><label for="professionalDeadline">Useful by</label><input id="professionalDeadline" type="date" data-professional-field="deadline" value="${escapeHtml(p.deadline)}"></div></section>
           <section class="card"><p class="eyebrow">Working steps</p><div class="task-checks">${module.tasks.map((task,index) => `<label><input type="checkbox" data-professional-task="${index}" ${p.tasks[index] ? "checked" : ""}><span>${escapeHtml(task)}</span></label>`).join("")}</div></section>
           <section class="card"><p class="eyebrow">Use it at work</p><p>${escapeHtml(module.workUse)}</p></section>
+          <div class="button-row">${bookmarkButton("professional", module.id)}<button class="btn" data-print-page>Export page / PDF</button></div>
           <button class="btn ${p.completed ? "" : "btn-primary"}" data-professional-complete="${module.id}">${p.completed ? "✓ Pathway completed — reopen" : "Complete pathway"}</button>
         </aside>
       </div>
-      <canvas class="ink-canvas annotation-canvas full-page-canvas" data-ink-surface="${pageSurface}" aria-label="Full professional-pathway annotation layer"></canvas>
+      ${renderStickyNotes(pageSurface)}<canvas class="ink-canvas annotation-canvas full-page-canvas" data-ink-surface="${pageSurface}" aria-label="Full professional-pathway annotation layer"></canvas>
     </div>`;
   }
 
   function renderProfessionalInkPad(moduleId) {
     const surface = `professional:${moduleId}:notes`;
     return `<section class="ink-pad" data-ink-container="${surface}"><h4>Handwritten working page</h4><p>Use Apple Pencil or a mouse. This page is saved with the pathway and included in backups.</p>${renderInkToolbar(surface)}<canvas class="ink-canvas" data-ink-surface="${surface}" aria-label="Handwritten professional notes"></canvas></section>`;
+  }
+
+  function bookmarkKey(type, id) { return `${type}:${id}`; }
+  function isBookmarked(type, id) { return Boolean(state.bookmarks?.[bookmarkKey(type, id)]); }
+  function bookmarkButton(type, id, label = "Bookmark") {
+    const saved = isBookmarked(type, id);
+    return `<button class="btn" data-bookmark="${type}:${id}">${saved ? "★ Saved" : `☆ ${escapeHtml(label)}`}</button>`;
+  }
+
+  function universalResults() {
+    const query = (state.searchQuery || "").trim().toLowerCase();
+    const results = [];
+    DATA.courses.forEach(course => {
+      const p = state.progress[course.id] || {};
+      const text = [course.code, course.title, course.faculty, course.question, course.lecture, p.doorAnswer, p.notes, p.surprise, p.passport].join(" ").toLowerCase();
+      if ((!query && isBookmarked("course", course.id)) || (query && text.includes(query))) results.push({ kind:"Course", title:`${course.code} · ${course.title}`, detail:course.faculty, action:`data-course="${course.id}"`, saved:isBookmarked("course", course.id) });
+    });
+    PROFESSIONAL_MODULES.forEach(module => {
+      const p = state.professionalProgress[module.id] || {};
+      const text = [module.title, module.area, module.summary, module.goal, p.output, p.evidence, p.notes].join(" ").toLowerCase();
+      if ((!query && isBookmarked("professional", module.id)) || (query && text.includes(query))) results.push({ kind:"Pathway", title:module.title, detail:module.area, action:`data-professional="${module.id}"`, saved:isBookmarked("professional", module.id) });
+    });
+    (state.customProjects || []).forEach(project => {
+      const text = [project.title, project.goal, project.output, project.notes].join(" ").toLowerCase();
+      if ((!query && isBookmarked("custom", project.id)) || (query && text.includes(query))) results.push({ kind:"My project", title:project.title, detail:project.goal || "Custom pathway", action:`data-custom-project="${project.id}"`, saved:isBookmarked("custom", project.id) });
+    });
+    [...state.cabinet.map(item => ({...item, kind:"Cabinet", detail:item.label || "Question"})), ...state.commonplace.map(item => ({...item, kind:"Commonplace", detail:item.source || "Discovery"}))].forEach(item => {
+      if (query && `${item.text} ${item.detail}`.toLowerCase().includes(query)) results.push({ kind:item.kind, title:item.text, detail:item.detail, action:`data-view="${item.kind === "Cabinet" ? "cabinet" : "commonplace"}"` });
+    });
+    Object.entries(state.stickyNotes || {}).forEach(([surface, notes]) => notes.forEach(note => {
+      if (query && note.text?.toLowerCase().includes(query)) {
+        const courseMatch = surface.match(/^fullpage:([^:]+):/), professionalMatch = surface.match(/^professional:([^:]+):fullpage$/), customMatch = surface.match(/^custom:([^:]+):fullpage$/);
+        const action = courseMatch ? `data-course="${courseMatch[1]}"` : professionalMatch ? `data-professional="${professionalMatch[1]}"` : customMatch ? `data-custom-project="${customMatch[1]}"` : `data-view="dashboard"`;
+        results.push({ kind:"Sticky note", title:note.text, detail:"Page annotation", action });
+      }
+    }));
+    return results.slice(0, 80);
+  }
+
+  function renderSearch() {
+    const results = universalResults();
+    const emptyCopy = state.searchQuery ? "No Academy rooms or records match that search." : "Bookmark a course or pathway and it will wait here for you.";
+    return `<div class="page">${pageHeader("The Lantern Index", "Search the whole Academy", "Find courses, pathways, your typed notes, Cabinet questions, discoveries and custom projects.")}
+      <section class="card" style="margin-bottom:20px"><div class="field"><label for="academySearch">Search everything</label><input id="academySearch" type="search" value="${escapeHtml(state.searchQuery || "")}" placeholder="Try accessibility, folklore, a phrase from your notes…"></div><p class="muted small">Leave the box empty to see bookmarks.</p></section>
+      <section class="search-results">${results.length ? results.map(result => `<button class="search-result" ${result.action}><span class="search-kind">${escapeHtml(result.kind)}</span><span><strong>${escapeHtml(result.title)}</strong><small>${escapeHtml(result.detail)}</small></span><span class="bookmark-star">${result.saved ? "★" : "→"}</span></button>`).join("") : `<div class="empty">${emptyCopy}</div>`}</section>
+    </div>`;
   }
 
   function filteredCourses() {
@@ -922,10 +1089,10 @@ if(__exports != exports)module.exports = exports;return module.exports}));
           <p class="eyebrow">Course compass</p>
           <h3>${escapeHtml(course.question)}</h3>
           <ul><li>${course.resources.length} library doors</li><li>${course.rabbitHoles.length} rabbit-hole trails</li><li>${course.fieldQuestions.length} field questions</li></ul>
-          <div class="button-row"><button class="btn btn-primary" data-focus="on">Enter Focus Mode</button><button class="btn" data-add-question="${course.id}">Carry this question</button></div>
+          <div class="button-row"><button class="btn btn-primary" data-focus="on">Enter Focus Mode</button><button class="btn" data-add-question="${course.id}">Carry this question</button>${bookmarkButton("course", course.id)}<button class="btn" data-print-page>Export page / PDF</button></div>
         </aside>
       </div>
-      <canvas class="ink-canvas annotation-canvas full-page-canvas" data-ink-surface="${pageSurface}" aria-label="Full course-page annotation layer"></canvas>
+      ${renderStickyNotes(pageSurface)}<canvas class="ink-canvas annotation-canvas full-page-canvas" data-ink-surface="${pageSurface}" aria-label="Full course-page annotation layer"></canvas>
     </div>`;
   }
 
@@ -947,7 +1114,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       <div class="field"><label for="surprise">What surprised or contradicted me</label><textarea id="surprise" data-course-field="surprise">${escapeHtml(progress.surprise)}</textarea>${renderInkPad("surprise", "Write this answer by hand")}</div>
       <div class="field wide"><label for="courseNotes">Field notes and connections</label><textarea id="courseNotes" data-course-field="notes" placeholder="Type, dictate, or use Apple Pencil Scribble…">${escapeHtml(progress.notes)}</textarea>${renderInkPad("notes", "Handwritten notes and connections")}</div>
       <div class="field wide"><label for="passport">One sentence for my Academic Passport</label><textarea id="passport" data-course-field="passport" placeholder="The sentence you want to carry forward…">${escapeHtml(progress.passport)}</textarea>${renderInkPad("passport", "Write your passport sentence by hand")}</div>
-    </div><div class="button-row" style="margin-top:18px"><button class="btn btn-primary" data-save-discovery="${course.id}">Record this visit</button><button class="btn" data-commonplace-from-course="${course.id}">Send to Commonplace Book</button></div>`;
+    </div><div class="button-row" style="margin-top:18px"><button class="btn btn-primary" data-save-discovery="${course.id}">Record this visit</button><button class="btn" data-commonplace-from-course="${course.id}">Send to Commonplace Book</button><button class="btn" data-convert-course="${course.id}">Turn this into a work pathway</button></div>`;
   }
 
   function renderCabinet() {
@@ -981,9 +1148,11 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     const visits = visitedCourses().sort((a, b) => new Date(state.progress[b.id].lastVisited) - new Date(state.progress[a.id].lastVisited));
     const professionalVisits = PROFESSIONAL_MODULES.filter(module => state.professionalProgress[module.id]?.lastVisited);
     const professionalComplete = professionalVisits.filter(module => state.professionalProgress[module.id]?.completed);
+    const customVisits = (state.customProjects || []).filter(project => project.lastVisited);
+    const customComplete = customVisits.filter(project => project.completed);
     return `<div class="page">
       ${pageHeader("Academy Records", "Record of Discoveries & Practice", "Curiosity, capability and useful work—recorded without pretending your worth is a percentage.", '<button class="btn" onclick="window.print()">Print record</button>')}
-      <section class="card passport-summary"><div class="seal-large">${complete.length + professionalComplete.length}</div><div><p class="eyebrow">Lantern Academy standing</p><h2>${complete.length + professionalComplete.length ? "Scholar of active curiosity and practice" : "Newly admitted explorer"}</h2><p>${visits.length} curiosity courses visited · ${professionalVisits.length} professional pathways opened · ${state.commonplace.length} discoveries preserved.</p></div></section>
+      <section class="card passport-summary"><div class="seal-large">${complete.length + professionalComplete.length + customComplete.length}</div><div><p class="eyebrow">Lantern Academy standing</p><h2>${complete.length + professionalComplete.length + customComplete.length ? "Scholar of active curiosity and practice" : "Newly admitted explorer"}</h2><p>${visits.length} curiosity courses visited · ${professionalVisits.length + customVisits.length} professional pathways opened · ${state.commonplace.length} discoveries preserved.</p></div></section>
       <section class="card"><h2>Faculty stamps</h2><div class="faculty-progress">${DATA.faculties.map(faculty => {
         const count = faculty.courseIds.filter(id => coursePercent(id) === 100).length;
         return `<div class="faculty-progress-row" style="--faculty:${faculty.colour}"><strong>${escapeHtml(faculty.name)}</strong><div class="track"><span style="width:${count / 8 * 100}%"></span></div><span>${count}/8</span></div>`;
@@ -997,21 +1166,22 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       <section class="course-list">${professionalVisits.length ? professionalVisits.map(module => {
         const p = professionalProgressFor(module.id);
         return `<button class="course-row" data-professional="${module.id}" style="--faculty:#476058;text-align:left"><span class="course-code">◆</span><span><strong>${escapeHtml(module.title)}</strong><small>${escapeHtml(p.evidence || p.output || "Pathway opened")}</small></span><span class="progress-pill ${p.completed ? "complete" : ""}">${professionalPercent(module.id)}%</span></button>`;
-      }).join("") : '<div class="empty">Your applied pathways, outputs and CPD reflections will appear here.</div>'}</section>
+      }).join("") : '<div class="empty">Your applied pathways, outputs and CPD reflections will appear here.</div>'}${customVisits.map(project => `<button class="course-row" data-custom-project="${project.id}" style="--faculty:#8a5c3b;text-align:left"><span class="course-code">✦</span><span><strong>${escapeHtml(project.title)}</strong><small>${escapeHtml(project.evidence || project.output || "Custom pathway opened")}</small></span><span class="progress-pill ${project.completed ? "complete" : ""}">${project.completed ? "100%" : "In progress"}</span></button>`).join("")}</section>
     </div>`;
   }
 
   function renderSettings() {
     const savedKb = Math.round(new Blob([JSON.stringify(state)]).size / 1024);
+    const lastExport = state.backupMeta?.lastExport ? new Date(state.backupMeta.lastExport).toLocaleString("en-GB", {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "No backup exported yet";
     return `<div class="page">
       ${pageHeader("System Office", "Settings & backup", "Your work is stored on this device. Export a backup to move it or keep it safe.")}
       <section class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
         <div class="card"><p class="eyebrow">Install</p><h3>Make it feel like an app</h3><p class="muted">Install Lantern Academy from your browser for a full-screen icon and offline access.</p><button id="installButton" class="btn btn-primary" ${deferredInstallPrompt ? "" : "disabled"}>${deferredInstallPrompt ? "Install Lantern Academy" : "Use your browser's Add to Home Screen"}</button></div>
-        <div class="card"><p class="eyebrow">Backup</p><h3>Carry your university</h3><p class="muted">Current private study record: approximately ${savedKb} KB.</p><div class="button-row"><button class="btn btn-primary" data-export>Export backup</button><button class="btn" data-import>Import backup</button></div></div>
+        <div class="card"><p class="eyebrow">Protected backup</p><h3>Carry your Academy safely</h3><p class="muted">Current private study record: approximately ${savedKb} KB. Exports include an integrity check before they can replace your work.</p><div class="button-row"><button class="btn btn-primary" data-export>Export verified backup</button><button class="btn" data-import>Import backup</button></div><div class="storage-status"><span>●</span><span>${escapeHtml(lastExport)}</span></div></div>
         <div class="card"><p class="eyebrow">Offline</p><h3>Downloaded campus</h3><p class="muted">The 48 course lectures and app interface are included. External video, audio and article links still require internet.</p><button class="btn" data-refresh-cache>Refresh offline copy</button></div>
         <div class="card"><p class="eyebrow">Private records</p><h3>Begin again</h3><p class="muted">This permanently removes local notes, answers and progress from this device. Export first if uncertain.</p><button class="btn" data-reset>Erase local study record</button></div>
       </section>
-      <section class="card" style="margin-top:20px"><h2>What is inside this edition</h2><p>Three study modes · six curiosity faculties · 48 complete course portals · 12 applied professional pathways · integrated reading, tasks, work outputs, Pencil notes, Curiosity Cabinet, Commonplace Book, Academy record, offline caching, backup and restore.</p><p class="muted small">Lantern Academy release 2.0. Automatic account-based device sync is not part of this local-first release.</p></section>
+      <section class="card" style="margin-top:20px"><h2>What is inside this edition</h2><p>Three study modes · six curiosity faculties · 48 complete course portals · 12 Academy pathways · custom professional pathways · universal search and bookmarks · integrated reading, tasks, work outputs, full-page Pencil notes, sticky notes, Curiosity Cabinet, Commonplace Book, Academy record, offline caching, verified backup and restore.</p><p class="muted small">Lantern Academy release 2.1. Automatic account-based device sync is not part of this local-first release.</p></section>
     </div>`;
   }
 
@@ -1023,11 +1193,11 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     state.recent = [courseId, ...state.recent.filter(id => id !== courseId)].slice(0, 10);
   }
 
-  function openCourse(courseId, route) {
+  function openCourse(courseId, route, resume = false) {
     const progress = progressFor(courseId);
     if (route) progress.route = route;
     markVisited(courseId);
-    setView("course", { courseId, tab: "lecture" });
+    setView("course", { courseId, tab: resume ? (progress.lastTab || "lecture") : "lecture" });
   }
 
   function openProfessional(moduleId) {
@@ -1071,7 +1241,9 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   }
 
   function inkRecords(surface) {
-    const progress = surface.startsWith("professional:") ? professionalProgressFor(state.currentProfessional) : progressFor(state.currentCourse);
+    const progress = surface.startsWith("professional:") ? professionalProgressFor(state.currentProfessional) : surface.startsWith("custom:") ? customProjectFor(state.currentCustomProject) : progressFor(state.currentCourse);
+    if (!progress) return [];
+    if (!progress.ink) progress.ink = {};
     return progress.ink[surface] || (progress.ink[surface] = []);
   }
 
@@ -1115,7 +1287,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   }
 
   function initInkCanvases() {
-    if (!["course","professionalCourse"].includes(state.currentView)) return;
+    if (!["course","professionalCourse","customProject"].includes(state.currentView)) return;
     document.querySelectorAll("[data-ink-surface]").forEach(canvas => {
       sizeInkCanvas(canvas);
       if (window.ResizeObserver) new ResizeObserver(() => sizeInkCanvas(canvas)).observe(canvas);
@@ -1140,8 +1312,9 @@ if(__exports != exports)module.exports = exports;return module.exports}));
         if (!stroke) return;
         stroke = null;
         const professional = canvas.dataset.inkSurface.startsWith("professional:");
-        const progress = professional ? professionalProgressFor(state.currentProfessional) : progressFor(state.currentCourse);
-        if (!professional && canvas.dataset.inkSurface === "answer:doorAnswer") progress.milestones.question = true;
+        const custom = canvas.dataset.inkSurface.startsWith("custom:");
+        const progress = professional ? professionalProgressFor(state.currentProfessional) : custom ? customProjectFor(state.currentCustomProject) : progressFor(state.currentCourse);
+        if (!professional && !custom && canvas.dataset.inkSurface === "answer:doorAnswer") progress.milestones.question = true;
         progress.lastVisited = new Date().toISOString();
         saveState("Handwriting saved.");
       };
@@ -1163,6 +1336,22 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   }
 
   document.addEventListener("click", event => {
+    const addSticky = event.target.closest("[data-add-sticky]");
+    if (addSticky) {
+      const surface = addSticky.dataset.addSticky;
+      const notes = stickyNotesFor(surface);
+      notes.push({ id:uid(), text:"", x:6 + notes.length * 3, y:12 + notes.length * 3 });
+      saveState("Sticky note added.");
+      return render();
+    }
+    const deleteSticky = event.target.closest("[data-delete-sticky]");
+    if (deleteSticky) {
+      const splitAt = deleteSticky.dataset.deleteSticky.lastIndexOf(":");
+      const surface = deleteSticky.dataset.deleteSticky.slice(0, splitAt), id = deleteSticky.dataset.deleteSticky.slice(splitAt + 1);
+      state.stickyNotes[surface] = stickyNotesFor(surface).filter(note => note.id !== id);
+      saveState("Sticky note removed.");
+      return render();
+    }
     const inkToolbar = event.target.closest("[data-ink-toolbar]");
     if (inkToolbar) {
       const surface = inkToolbar.dataset.inkToolbar;
@@ -1176,7 +1365,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       if (action?.dataset.inkAction === "visibility") setting.visible = !setting.visible;
       if (action?.dataset.inkAction === "undo") inkRecords(surface).pop();
       if (action?.dataset.inkAction === "clear" && inkRecords(surface).length && confirm("Clear all handwriting on this area?")) {
-        const progress = surface.startsWith("professional:") ? professionalProgressFor(state.currentProfessional) : progressFor(state.currentCourse);
+        const progress = surface.startsWith("professional:") ? professionalProgressFor(state.currentProfessional) : surface.startsWith("custom:") ? customProjectFor(state.currentCustomProject) : progressFor(state.currentCourse);
         progress.ink[surface] = [];
       }
       updateInkToolbar(inkToolbar, surface);
@@ -1200,6 +1389,47 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     const professionalButton = event.target.closest("[data-professional]");
     if (professionalButton) return openProfessional(professionalButton.dataset.professional);
 
+    const customButton = event.target.closest("[data-custom-project]");
+    if (customButton) {
+      state.currentCustomProject = customButton.dataset.customProject;
+      const project = customProjectFor(state.currentCustomProject);
+      if (project) project.lastVisited = new Date().toISOString();
+      return setView("customProject");
+    }
+
+    const bookmark = event.target.closest("[data-bookmark]");
+    if (bookmark) {
+      state.bookmarks = state.bookmarks || {};
+      state.bookmarks[bookmark.dataset.bookmark] = !state.bookmarks[bookmark.dataset.bookmark];
+      saveState(state.bookmarks[bookmark.dataset.bookmark] ? "Saved to your Lantern Index." : "Bookmark removed.");
+      return render();
+    }
+
+    if (event.target.closest("[data-toggle-project-form]")) {
+      const form = document.getElementById("customProjectForm");
+      form.hidden = !form.hidden;
+      if (!form.hidden) form.querySelector("input")?.focus();
+      return;
+    }
+
+    const customComplete = event.target.closest("[data-custom-complete]");
+    if (customComplete) {
+      const project = customProjectFor(customComplete.dataset.customComplete);
+      project.completed = !project.completed;
+      project.lastVisited = new Date().toISOString();
+      saveState(project.completed ? "Custom pathway added to your record." : "Custom pathway reopened.");
+      return render();
+    }
+
+    const deleteCustom = event.target.closest("[data-delete-custom]");
+    if (deleteCustom && confirm("Archive this custom pathway? Its text and notes will be removed from this device.")) {
+      state.customProjects = state.customProjects.filter(item => item.id !== deleteCustom.dataset.deleteCustom);
+      saveState("Custom pathway archived.");
+      return setView("professional");
+    }
+
+    if (event.target.closest("[data-print-page]")) return window.print();
+
     const professionalComplete = event.target.closest("[data-professional-complete]");
     if (professionalComplete) {
       const p = professionalProgressFor(professionalComplete.dataset.professionalComplete);
@@ -1210,7 +1440,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     }
 
     const courseButton = event.target.closest("[data-course]");
-    if (courseButton) return openCourse(courseButton.dataset.course, courseButton.dataset.route);
+    if (courseButton) return openCourse(courseButton.dataset.course, courseButton.dataset.route, courseButton.hasAttribute("data-resume-course"));
 
     const facultyButton = event.target.closest("[data-faculty]");
     if (facultyButton) return openFaculty(facultyButton.dataset.faculty);
@@ -1241,6 +1471,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     const tabButton = event.target.closest("[data-tab]");
     if (tabButton) {
       state.currentTab = tabButton.dataset.tab;
+      progressFor(state.currentCourse).lastTab = state.currentTab;
       saveState();
       render();
       return window.scrollTo({ top: 500, behavior: "smooth" });
@@ -1292,6 +1523,15 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       return;
     }
 
+    const convertCourse = event.target.closest("[data-convert-course]");
+    if (convertCourse) {
+      const course = courseById[convertCourse.dataset.convertCourse], p = progressFor(course.id);
+      const project = { id:uid(), title:`Apply ${course.title} at work`, goal:`Explore how ${course.question.toLowerCase()} could improve a real piece of work.`, priority:"medium", deadline:"", plan:`Starting course: ${course.code} · ${course.title}\n\nUseful discovery: ${p.passport || p.surprise || p.notes || ""}`, output:"", evidence:"", notes:"", ink:{}, completed:false, createdAt:new Date().toISOString(), lastVisited:new Date().toISOString(), sourceCourseId:course.id };
+      state.customProjects.unshift(project); state.currentCustomProject = project.id;
+      saveState("Curiosity became a professional pathway.");
+      return setView("customProject");
+    }
+
     const deleteEntry = event.target.closest("[data-delete-entry]");
     if (deleteEntry) {
       const [collection, id] = deleteEntry.dataset.deleteEntry.split(":");
@@ -1316,6 +1556,21 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   document.addEventListener("input", event => {
     if (event.target.matches("[data-course-field]")) updateCourseField(event.target);
     if (event.target.matches("[data-professional-field]")) updateProfessionalField(event.target);
+    if (event.target.matches("[data-custom-field]")) {
+      const project = customProjectFor(state.currentCustomProject);
+      if (project) { project[event.target.dataset.customField] = event.target.value; project.lastVisited = new Date().toISOString(); saveState(); }
+    }
+    if (event.target.matches("[data-state-field]")) { state[event.target.dataset.stateField] = event.target.value; saveState(); }
+    if (event.target.matches("[data-sticky-text]")) {
+      const splitAt = event.target.dataset.stickyText.lastIndexOf(":"), surface = event.target.dataset.stickyText.slice(0, splitAt), id = event.target.dataset.stickyText.slice(splitAt + 1);
+      const note = stickyNotesFor(surface).find(item => item.id === id);
+      if (note) { note.text = event.target.value; saveState(); }
+    }
+    if (event.target.id === "academySearch") {
+      state.searchQuery = event.target.value; saveState();
+      const position = event.target.selectionStart; render();
+      const search = document.getElementById("academySearch"); search?.focus(); search?.setSelectionRange(position, position);
+    }
     if (event.target.id === "courseSearch") {
       state.catalogueQuery = event.target.value;
       saveState();
@@ -1329,6 +1584,10 @@ if(__exports != exports)module.exports = exports;return module.exports}));
 
   document.addEventListener("change", event => {
     if (event.target.matches("[data-professional-field]")) updateProfessionalField(event.target);
+    if (event.target.matches("[data-custom-field]")) {
+      const project = customProjectFor(state.currentCustomProject);
+      if (project) { project[event.target.dataset.customField] = event.target.value; saveState("Custom pathway saved."); }
+    }
     if (event.target.matches("[data-professional-task]")) {
       const p = professionalProgressFor(state.currentProfessional);
       p.tasks[event.target.dataset.professionalTask] = event.target.checked;
@@ -1351,6 +1610,14 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   });
 
   document.addEventListener("submit", event => {
+    if (event.target.id === "customProjectForm") {
+      event.preventDefault();
+      const project = { id:uid(), title:document.getElementById("projectTitle").value.trim(), goal:document.getElementById("projectGoal").value.trim(), priority:document.getElementById("projectPriority").value, deadline:document.getElementById("projectDeadline").value, plan:"", output:"", evidence:"", notes:"", ink:{}, completed:false, createdAt:new Date().toISOString(), lastVisited:new Date().toISOString() };
+      if (!project.title || !project.goal) return;
+      state.customProjects.unshift(project); state.currentCustomProject = project.id;
+      saveState("Your pathway is ready.");
+      return setView("customProject");
+    }
     if (event.target.id === "cabinetForm") {
       event.preventDefault();
       const text = document.getElementById("cabinetQuestion").value.trim();
@@ -1371,8 +1638,18 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     }
   });
 
-  function exportBackup() {
-    const payload = { app: "Lantern Academy", exportedAt: new Date().toISOString(), dataVersion: "2.0", state };
+  async function sha256(value) {
+    if (!window.crypto?.subtle) return null;
+    const bytes = await window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+    return [...new Uint8Array(bytes)].map(byte => byte.toString(16).padStart(2,"0")).join("");
+  }
+
+  async function exportBackup() {
+    state.backupMeta = state.backupMeta || {};
+    state.backupMeta.lastExport = new Date().toISOString();
+    saveState();
+    const stateJson = JSON.stringify(state);
+    const payload = { app: "Lantern Academy", exportedAt: state.backupMeta.lastExport, dataVersion: "2.1", checksum: await sha256(stateJson), state };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -1389,6 +1666,11 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     try {
       const payload = JSON.parse(await file.text());
       if (!["Lantern Academy","Holiday University"].includes(payload.app) || !payload.state) throw new Error("Not a Lantern Academy backup");
+      if (payload.checksum && payload.checksum !== await sha256(JSON.stringify(payload.state))) throw new Error("Backup integrity check failed");
+      try {
+        const current = JSON.stringify(state);
+        if (current.length < 1500000) localStorage.setItem(RECOVERY_KEY, current);
+      } catch (_) {}
       state = { ...freshDefaults(), ...payload.state, currentView: "dashboard" };
       saveState("University backup restored.");
       render();
