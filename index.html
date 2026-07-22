@@ -10,6 +10,7 @@
   <title>Lantern Academy</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
 
@@ -525,6 +526,15 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   const importInput = document.getElementById("importInput");
   let deferredInstallPrompt = null;
   let toastTimer = null;
+  const GOOGLE_CLIENT_ID = "171753843722-onslgj2vgibj4s2mo1n8kkc6u3a0fd06.apps.googleusercontent.com";
+  const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+  const DRIVE_FOLDER_NAME = "Lantern Academy";
+  const DRIVE_FILE_NAME = "Lantern-Academy-Sync.json";
+  const DRIVE_IDS_KEY = "lantern-academy-drive-ids-v1";
+  let driveToken = null;
+  let driveTokenClient = null;
+  let driveSyncTimer = null;
+  let driveSyncBusy = false;
 
   const defaults = {
     version: 3,
@@ -545,6 +555,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     searchQuery: "",
     blendedConnection: "",
     backupMeta: { lastExport: null, lastSaved: null },
+    syncMeta: { enabled: false, lastSync: null, remoteUpdatedAt: null },
     cabinet: [],
     commonplace: [],
     recent: [],
@@ -554,13 +565,13 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   let state = loadState();
 
   function freshDefaults() {
-    return { ...defaults, progress: {}, professionalProgress: {}, customProjects: [], bookmarks: {}, stickyNotes: {}, cabinet: [], commonplace: [], recent: [], backupMeta: { lastExport: null, lastSaved: null }, matriculatedAt: new Date().toISOString() };
+    return { ...defaults, progress: {}, professionalProgress: {}, customProjects: [], bookmarks: {}, stickyNotes: {}, cabinet: [], commonplace: [], recent: [], backupMeta: { lastExport: null, lastSaved: null }, syncMeta: { enabled: false, lastSync: null, remoteUpdatedAt: null }, matriculatedAt: new Date().toISOString() };
   }
 
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      return saved ? { ...freshDefaults(), ...saved, version: defaults.version, backupMeta: { ...freshDefaults().backupMeta, ...(saved.backupMeta || {}) } } : freshDefaults();
+      return saved ? { ...freshDefaults(), ...saved, version: defaults.version, backupMeta: { ...freshDefaults().backupMeta, ...(saved.backupMeta || {}) }, syncMeta: { ...freshDefaults().syncMeta, ...(saved.syncMeta || {}) } } : freshDefaults();
     } catch (_) {
       return freshDefaults();
     }
@@ -571,6 +582,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     state.backupMeta.lastSaved = new Date().toISOString();
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      scheduleDriveSync();
       if (message) showToast(message);
     } catch (_) {
       showToast("This device is low on study storage. Export a backup now.");
@@ -582,6 +594,172 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     toast.textContent = message;
     toast.classList.add("show");
     toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+  }
+
+  function persistStateSilently() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function driveIds() {
+    try { return JSON.parse(localStorage.getItem(DRIVE_IDS_KEY)) || {}; } catch (_) { return {}; }
+  }
+
+  function saveDriveIds(ids) {
+    localStorage.setItem(DRIVE_IDS_KEY, JSON.stringify(ids));
+  }
+
+  function scheduleDriveSync() {
+    clearTimeout(driveSyncTimer);
+    if (!state?.syncMeta?.enabled || !driveToken || driveSyncBusy) return;
+    driveSyncTimer = setTimeout(() => syncWithDrive({ quiet: true }), 1600);
+  }
+
+  function hasLocalStudyWork(candidate = state) {
+    return Object.keys(candidate.progress || {}).length > 0 || Object.keys(candidate.professionalProgress || {}).length > 0 ||
+      (candidate.customProjects || []).length > 0 || (candidate.cabinet || []).length > 0 ||
+      (candidate.commonplace || []).length > 0 || Object.keys(candidate.stickyNotes || {}).length > 0;
+  }
+
+  function initDriveTokenClient() {
+    if (driveTokenClient) return true;
+    if (!window.google?.accounts?.oauth2) return false;
+    driveTokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: DRIVE_SCOPE,
+      callback: () => {}
+    });
+    return true;
+  }
+
+  function requestDriveToken(prompt = "consent") {
+    return new Promise((resolve, reject) => {
+      if (!initDriveTokenClient()) return reject(new Error("Google sign-in is still loading"));
+      driveTokenClient.callback = response => {
+        if (response.error) return reject(new Error(response.error));
+        driveToken = response.access_token;
+        resolve(response);
+      };
+      driveTokenClient.requestAccessToken({ prompt });
+    });
+  }
+
+  async function driveRequest(url, options = {}) {
+    if (!driveToken) throw new Error("Google Drive is not connected");
+    const response = await fetch(url, { ...options, headers: { ...(options.headers || {}), Authorization: `Bearer ${driveToken}` } });
+    if (response.status === 401) { driveToken = null; throw new Error("Google Drive session expired"); }
+    if (!response.ok) throw new Error(`Google Drive returned ${response.status}`);
+    if (response.status === 204) return null;
+    return response.json();
+  }
+
+  async function findDriveItem(query) {
+    const params = new URLSearchParams({ q: `${query} and trashed = false`, fields: "files(id,name,modifiedTime,parents)", pageSize: "10" });
+    const result = await driveRequest(`https://www.googleapis.com/drive/v3/files?${params}`);
+    return result.files?.[0] || null;
+  }
+
+  async function createDriveJson(name, contents, folderId, role) {
+    const boundary = `lantern-${Date.now()}`;
+    const metadata = { name, mimeType: "application/json", parents: folderId ? [folderId] : undefined, appProperties: { lanternAcademy: "true", role } };
+    const body = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n--${boundary}\r\nContent-Type: application/json\r\n\r\n${contents}\r\n--${boundary}--`;
+    return driveRequest("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,modifiedTime", { method: "POST", headers: { "Content-Type": `multipart/related; boundary=${boundary}` }, body });
+  }
+
+  async function ensureDriveFiles() {
+    const ids = driveIds();
+    if (!ids.folderId) {
+      const found = await findDriveItem("mimeType = 'application/vnd.google-apps.folder' and appProperties has { key='lanternAcademy' and value='true' }");
+      if (found) ids.folderId = found.id;
+      else {
+        const folder = await driveRequest("https://www.googleapis.com/drive/v3/files?fields=id,name", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: DRIVE_FOLDER_NAME, mimeType: "application/vnd.google-apps.folder", appProperties: { lanternAcademy: "true", role: "folder" } }) });
+        ids.folderId = folder.id;
+      }
+    }
+    if (!ids.fileId) {
+      const found = await findDriveItem(`name = '${DRIVE_FILE_NAME}' and '${ids.folderId}' in parents and appProperties has { key='lanternAcademy' and value='true' }`);
+      if (found) ids.fileId = found.id;
+    }
+    saveDriveIds(ids);
+    return ids;
+  }
+
+  async function readRemoteRecord(fileId) {
+    if (!fileId) return null;
+    try { return await driveRequest(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`); }
+    catch (error) { if (/404/.test(error.message)) return null; throw error; }
+  }
+
+  async function writeRemoteRecord(ids, payloadText) {
+    if (!ids.fileId) {
+      const created = await createDriveJson(DRIVE_FILE_NAME, payloadText, ids.folderId, "current");
+      ids.fileId = created.id; saveDriveIds(ids);
+    } else {
+      await driveRequest(`https://www.googleapis.com/upload/drive/v3/files/${ids.fileId}?uploadType=media`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: payloadText });
+    }
+    const day = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem("lantern-academy-drive-snapshot-day") !== day) {
+      await createDriveJson(`Recovery-${day}.json`, payloadText, ids.folderId, "recovery");
+      localStorage.setItem("lantern-academy-drive-snapshot-day", day);
+    }
+  }
+
+  async function syncWithDrive({ quiet = false, forceDirection = null } = {}) {
+    if (driveSyncBusy) return;
+    if (!driveToken) { if (!quiet) showToast("Tap Connect Google Drive first."); return; }
+    driveSyncBusy = true;
+    try {
+      const ids = await ensureDriveFiles();
+      const remote = await readRemoteRecord(ids.fileId);
+      const localChanged = state.backupMeta?.lastSaved || state.matriculatedAt;
+      const lastSync = state.syncMeta?.lastSync;
+      const remoteChanged = remote?.updatedAt || remote?.state?.backupMeta?.lastSaved;
+      let direction = forceDirection;
+      if (!direction && remote?.state) {
+        const localDirty = !lastSync || new Date(localChanged) > new Date(lastSync);
+        const remoteDirty = !lastSync || (remoteChanged && new Date(remoteChanged) > new Date(lastSync));
+        if (!hasLocalStudyWork(state)) direction = "down";
+        else if (localDirty && remoteDirty && remote.deviceId !== localStorage.getItem("lantern-academy-device-id")) {
+          direction = confirm("This device and Google Drive both contain newer Academy work. Press OK to keep this device's version, or Cancel to use the Drive version.") ? "up" : "down";
+        } else direction = remoteChanged && new Date(remoteChanged) > new Date(localChanged) ? "down" : "up";
+      } else direction = direction || "up";
+      if (direction === "down" && remote?.state) {
+        state = { ...freshDefaults(), ...remote.state, currentView: state.currentView, syncMeta: { enabled: true, lastSync: new Date().toISOString(), remoteUpdatedAt: remoteChanged } };
+        persistStateSilently();
+        render();
+      } else {
+        let deviceId = localStorage.getItem("lantern-academy-device-id");
+        if (!deviceId) { deviceId = uid(); localStorage.setItem("lantern-academy-device-id", deviceId); }
+        const updatedAt = new Date().toISOString();
+        const payload = { app: "Lantern Academy", dataVersion: "3.0", updatedAt, deviceId, state: { ...state, syncMeta: { ...state.syncMeta, enabled: true } } };
+        await writeRemoteRecord(ids, JSON.stringify(payload));
+        state.syncMeta = { enabled: true, lastSync: updatedAt, remoteUpdatedAt: updatedAt };
+        persistStateSilently();
+      }
+      if (!quiet) showToast("Google Drive is up to date.");
+    } catch (error) {
+      if (!quiet) showToast(error.message.includes("expired") ? "Drive session expired. Reconnect to continue syncing." : "Drive sync could not finish.");
+    } finally {
+      driveSyncBusy = false;
+      if (state.currentView === "settings") render();
+    }
+  }
+
+  async function connectGoogleDrive() {
+    try {
+      await requestDriveToken("consent");
+      state.syncMeta = { ...(state.syncMeta || {}), enabled: true };
+      persistStateSilently();
+      await syncWithDrive();
+    } catch (_) { showToast("Google Drive connection was not completed."); }
+  }
+
+  function disconnectGoogleDrive() {
+    if (driveToken && window.google?.accounts?.oauth2) google.accounts.oauth2.revoke(driveToken, () => {});
+    driveToken = null;
+    state.syncMeta = { enabled: false, lastSync: state.syncMeta?.lastSync || null, remoteUpdatedAt: state.syncMeta?.remoteUpdatedAt || null };
+    persistStateSilently();
+    showToast("Google Drive disconnected on this device.");
+    render();
   }
 
   function escapeHtml(value = "") {
@@ -1173,15 +1351,18 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   function renderSettings() {
     const savedKb = Math.round(new Blob([JSON.stringify(state)]).size / 1024);
     const lastExport = state.backupMeta?.lastExport ? new Date(state.backupMeta.lastExport).toLocaleString("en-GB", {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "No backup exported yet";
+    const lastSync = state.syncMeta?.lastSync ? new Date(state.syncMeta.lastSync).toLocaleString("en-GB", {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "Not synced yet";
+    const driveStatus = driveToken ? "Connected for this session" : state.syncMeta?.enabled ? "Reconnect to resume" : "Not connected";
     return `<div class="page">
-      ${pageHeader("System Office", "Settings & backup", "Your work is stored on this device. Export a backup to move it or keep it safe.")}
+      ${pageHeader("System Office", "Settings, sync & backup", "Your work remains available offline on this device and can now travel safely through Google Drive.")}
       <section class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+        <div class="card"><p class="eyebrow">Google Drive sync</p><h3>Your Academy on every device</h3><p class="muted">Lantern Academy can access only the folder and records it creates. It cannot browse the rest of your Drive.</p><div class="storage-status"><span>●</span><span>${escapeHtml(driveStatus)} · ${escapeHtml(lastSync)}</span></div><div class="button-row" style="margin-top:14px">${driveToken ? '<button class="btn btn-primary" data-drive-sync>Sync now</button><button class="btn" data-drive-disconnect>Disconnect</button>' : '<button class="btn btn-primary" data-drive-connect>Connect Google Drive</button>'}</div><p class="muted small" style="margin-top:12px">After reopening the app, tap reconnect once. Automatic syncing continues while the Academy is open.</p></div>
         <div class="card"><p class="eyebrow">Install</p><h3>Make it feel like an app</h3><p class="muted">Install Lantern Academy from your browser for a full-screen icon and offline access.</p><button id="installButton" class="btn btn-primary" ${deferredInstallPrompt ? "" : "disabled"}>${deferredInstallPrompt ? "Install Lantern Academy" : "Use your browser's Add to Home Screen"}</button></div>
         <div class="card"><p class="eyebrow">Protected backup</p><h3>Carry your Academy safely</h3><p class="muted">Current private study record: approximately ${savedKb} KB. Exports include an integrity check before they can replace your work.</p><div class="button-row"><button class="btn btn-primary" data-export>Export verified backup</button><button class="btn" data-import>Import backup</button></div><div class="storage-status"><span>●</span><span>${escapeHtml(lastExport)}</span></div></div>
         <div class="card"><p class="eyebrow">Offline</p><h3>Downloaded campus</h3><p class="muted">The 48 course lectures and app interface are included. External video, audio and article links still require internet.</p><button class="btn" data-refresh-cache>Refresh offline copy</button></div>
         <div class="card"><p class="eyebrow">Private records</p><h3>Begin again</h3><p class="muted">This permanently removes local notes, answers and progress from this device. Export first if uncertain.</p><button class="btn" data-reset>Erase local study record</button></div>
       </section>
-      <section class="card" style="margin-top:20px"><h2>What is inside this edition</h2><p>Three study modes · six curiosity faculties · 48 complete course portals · 12 Academy pathways · custom professional pathways · universal search and bookmarks · integrated reading, tasks, work outputs, full-page Pencil notes, sticky notes, Curiosity Cabinet, Commonplace Book, Academy record, offline caching, verified backup and restore.</p><p class="muted small">Lantern Academy release 2.1. Automatic account-based device sync is not part of this local-first release.</p></section>
+      <section class="card" style="margin-top:20px"><h2>What is inside this edition</h2><p>Three study modes · six curiosity faculties · 48 complete course portals · 12 Academy pathways · custom professional pathways · universal search and bookmarks · integrated reading, tasks, work outputs, full-page Pencil notes, sticky notes, Curiosity Cabinet, Commonplace Book, Academy record, offline caching, verified backup and restore · Google Drive cross-device sync with daily recovery copies.</p><p class="muted small">Lantern Academy release 3.0 · The Living Academy. Local-first by design: losing a connection never locks you out of your work.</p></section>
     </div>`;
   }
 
@@ -1548,6 +1729,9 @@ if(__exports != exports)module.exports = exports;return module.exports}));
 
     if (event.target.closest("[data-export]")) return exportBackup();
     if (event.target.closest("[data-import]")) return importInput.click();
+    if (event.target.closest("[data-drive-connect]")) return connectGoogleDrive();
+    if (event.target.closest("[data-drive-sync]")) return syncWithDrive();
+    if (event.target.closest("[data-drive-disconnect]")) return disconnectGoogleDrive();
     if (event.target.closest("[data-reset]")) return resetState();
     if (event.target.closest("[data-refresh-cache]")) return refreshOfflineCopy();
     if (event.target.closest("#installButton")) return installApp();
@@ -1649,7 +1833,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     state.backupMeta.lastExport = new Date().toISOString();
     saveState();
     const stateJson = JSON.stringify(state);
-    const payload = { app: "Lantern Academy", exportedAt: state.backupMeta.lastExport, dataVersion: "2.1", checksum: await sha256(stateJson), state };
+    const payload = { app: "Lantern Academy", exportedAt: state.backupMeta.lastExport, dataVersion: "3.0", checksum: await sha256(stateJson), state };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");

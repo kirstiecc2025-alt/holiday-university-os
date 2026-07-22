@@ -1,7 +1,7 @@
 {
   "name": "Lantern Academy",
   "short_name": "Lantern Academy",
-  "description": "A private academy for curiosity, professional practice and useful crossings between them.",
+  "description": "A private, offline-first academy for curiosity, professional practice and learning that syncs through Google Drive.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
