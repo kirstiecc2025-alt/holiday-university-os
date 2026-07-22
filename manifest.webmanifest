@@ -1,7 +1,7 @@
 {
-  "name": "Holiday University — Curiosity OS",
-  "short_name": "University OS",
-  "description": "A private, self-directed university for curious minds.",
+  "name": "Lantern Academy",
+  "short_name": "Lantern Academy",
+  "description": "A private academy for curiosity, professional practice and useful crossings between them.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

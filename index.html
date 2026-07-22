@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#1d1a18">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Holiday University">
-  <title>Holiday University</title>
+  <meta name="apple-mobile-web-app-title" content="Lantern Academy">
+  <title>Lantern Academy</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <style>
@@ -53,6 +53,9 @@ a:hover { color: var(--gold); }
 .brand-seal { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; border: 1px solid var(--gold); border-radius: 50%; color: #d9bc77; font-size: 21px; }
 .brand strong { display: block; font-family: "Cormorant Garamond", Georgia, serif; font-size: 21px; line-height: 1; }
 .brand small { display: block; margin-top: 6px; color: #cbbda9; font-size: 10px; letter-spacing: .09em; text-transform: uppercase; }
+.mode-switch { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 0 0 20px; padding: 4px; border: 1px solid rgba(168,134,70,.4); border-radius: 10px; background: rgba(0,0,0,.18); }
+.mode-switch button { min-width: 0; padding: 8px 3px; color: #cbbda9; border: 0; border-radius: 7px; background: transparent; cursor: pointer; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.mode-switch button.active { color: #1d1a18; background: #d7ba78; }
 .primary-nav { display: grid; gap: 5px; }
 .primary-nav button, .sidebar-bottom button { width: 100%; padding: 11px 12px; display: flex; gap: 11px; align-items: center; text-align: left; color: #dcd2c5; background: transparent; border: 0; border-radius: 9px; cursor: pointer; }
 .primary-nav button span, .sidebar-bottom button span { width: 20px; color: #c3a45c; text-align: center; }
@@ -101,6 +104,28 @@ h3 { margin: 0 0 8px; font-size: 24px; }
 .capacity-option small { color: #736960; }
 .capacity-option.selected { color: #fff; border-color: var(--brown); background: var(--brown); }
 .recommendation { margin-top: 16px; padding: 17px; border-left: 3px solid var(--gold); background: var(--gold-soft); }
+.mode-banner { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 24px; padding: 16px 20px; color: #f8f0e4; border: 1px solid #9f7c3d; border-radius: 13px; background: linear-gradient(125deg,#25201d,#46372a); }
+.mode-banner strong { font: 600 22px "Cormorant Garamond", serif; }
+.mode-banner span { color: #d4c7b5; font-size: 13px; }
+.professional-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.professional-card { position: relative; min-height: 245px; text-align: left; cursor: pointer; }
+.professional-card .module-number { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 22px; color: #fff; border-radius: 50%; background: #476058; font: 600 18px "Cormorant Garamond",serif; }
+.professional-card h3 { font-size: 25px; }
+.professional-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.tag { display: inline-flex; padding: 4px 8px; color: #5e554d; border: 1px solid #cbbba5; border-radius: 999px; background: #f5eee3; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.priority-high { color: #fff; border-color: #7b4542; background: #7b4542; }
+.priority-medium { color: #fff; border-color: #6a6542; background: #6a6542; }
+.professional-hero { margin-bottom: 20px; padding: clamp(25px,5vw,48px); color: #fff8ef; border-radius: 18px; background: linear-gradient(135deg,#3f5b54,#202523); box-shadow: var(--shadow); }
+.professional-hero .eyebrow { color: #dfc784; }
+.professional-hero h1 { max-width: 850px; }
+.professional-layout { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 20px; align-items: start; }
+.lesson-block { margin: 0 0 18px; padding: 20px; border-left: 3px solid #607d74; background: rgba(240,235,225,.7); }
+.lesson-block p:last-child { margin-bottom: 0; }
+.work-output { border-color: #a88a4e; background: #fffaf0; }
+.professional-side { position: sticky; top: 22px; display: grid; gap: 12px; }
+.task-checks { display: grid; gap: 8px; margin: 14px 0; }
+.task-checks label { display: flex; gap: 10px; align-items: flex-start; padding: 11px; border: 1px solid #d5c7b5; border-radius: 8px; background: rgba(255,255,255,.5); }
+.blended-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
 .faculty-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .faculty-card { position: relative; min-height: 220px; overflow: hidden; cursor: pointer; }
@@ -112,8 +137,8 @@ h3 { margin: 0 0 8px; font-size: 24px; }
 .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
 .field { display: grid; gap: 6px; }
 .field label { color: #6d635b; font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
-input[type="search"], input[type="text"], select, textarea { width: 100%; color: var(--ink); border: 1px solid #bdae99; border-radius: 9px; background: rgba(255,253,249,.9); }
-input[type="search"], input[type="text"], select { height: 44px; padding: 0 13px; }
+input[type="search"], input[type="text"], input[type="date"], select, textarea { width: 100%; color: var(--ink); border: 1px solid #bdae99; border-radius: 9px; background: rgba(255,253,249,.9); }
+input[type="search"], input[type="text"], input[type="date"], select { height: 44px; padding: 0 13px; }
 textarea { min-height: 115px; padding: 13px; line-height: 1.55; resize: vertical; }
 .toolbar .field:first-child { flex: 1 1 300px; }
 .toolbar .field { flex: 0 1 220px; }
@@ -192,6 +217,13 @@ textarea { min-height: 115px; padding: 13px; line-height: 1.55; resize: vertical
 .ink-pad > p { margin: 0 0 10px; color: #71665d; font-size: 12px; }
 .ink-pad .ink-toolbar { margin-bottom: 9px; padding: 7px; }
 .ink-pad canvas { height: 180px; }
+.full-page-annotation { position: relative; }
+.full-page-ink { position: sticky; top: 10px; z-index: 12; margin-bottom: 14px; padding: 9px 12px; border: 1px solid #aa8b4f; border-radius: 11px; background: rgba(246,238,224,.96); box-shadow: 0 8px 24px rgba(29,26,24,.12); }
+.full-page-ink > p { margin: 0 0 6px; color: #6f5b34; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.full-page-ink .ink-toolbar { margin: 0; border: 0; padding: 0; background: transparent; }
+.full-page-canvas { position: absolute; z-index: 8; inset: 0; width: 100%; height: 100%; border: 0; border-radius: 0; background: transparent; pointer-events: none; touch-action: pan-y; }
+.full-page-annotation.ink-enabled > .full-page-canvas { pointer-events: auto; touch-action: pan-y; }
+.full-page-annotation.ink-hidden > .full-page-canvas { opacity: 0; }
 
 .entry-list { display: grid; gap: 10px; margin-top: 20px; }
 .entry { padding: 16px; border-left: 3px solid var(--gold); background: rgba(255,252,247,.75); }
@@ -224,6 +256,9 @@ body.focus-mode .focus-exit { display: block; }
   .capacity-options, .route-grid { grid-template-columns: repeat(2, 1fr); }
   .milestones { grid-template-columns: repeat(3, 1fr); }
   .course-body { grid-template-columns: 1fr; }
+  .professional-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .professional-layout { grid-template-columns: 1fr; }
+  .professional-side { position: static; }
   .side-card { position: static; }
 }
 
@@ -239,6 +274,7 @@ body.focus-mode .focus-exit { display: block; }
   .page-header { align-items: flex-start; flex-direction: column; }
   .dashboard-grid, .passport-summary { grid-template-columns: 1fr; }
   .faculty-grid { grid-template-columns: 1fr; }
+  .professional-grid, .blended-grid { grid-template-columns: 1fr; }
   .faculty-card { min-height: 190px; }
   .course-header { padding: 26px 21px; }
   .course-header::after { display: none; }
@@ -259,7 +295,7 @@ body.focus-mode .focus-exit { display: block; }
 }
 
 @media print {
-  .sidebar, .mobile-header, .mobile-nav, .button-row, .tabs, .side-card, .back-link, .ink-toolbar { display: none !important; }
+  .sidebar, .mobile-header, .mobile-nav, .button-row, .tabs, .side-card, .back-link, .ink-toolbar, .full-page-ink { display: none !important; }
   main { margin: 0; padding: 20px; background: #fff; }
   .card, .reading-panel { box-shadow: none; background: #fff; }
 }
@@ -269,12 +305,16 @@ body.focus-mode .focus-exit { display: block; }
 <body>
   <div class="app-shell">
     <aside class="sidebar" aria-label="University navigation">
-      <button class="brand" data-view="dashboard" aria-label="Holiday University home">
+      <button class="brand" data-view="dashboard" aria-label="Lantern Academy home">
         <span class="brand-seal" aria-hidden="true">✦</span>
-        <span><strong>Holiday University</strong><small>A private curriculum</small></span>
+        <span><strong>Lantern Academy</strong><small>Learn by lanternlight</small></span>
       </button>
+      <div class="mode-switch" role="group" aria-label="Study mode">
+        <button data-mode="curiosity">Curiosity</button><button data-mode="professional">Professional</button><button data-mode="blended">Blended</button>
+      </div>
       <nav class="primary-nav">
         <button data-view="dashboard" class="active"><span>⌂</span> Base Camp</button>
+        <button data-view="professional"><span>◆</span> Professional Studio</button>
         <button data-view="faculties"><span>⌘</span> Faculty Hall</button>
         <button data-view="catalogue"><span>☰</span> Course Registry</button>
         <button data-view="cabinet"><span>?</span> Curiosity Cabinet</button>
@@ -289,7 +329,7 @@ body.focus-mode .focus-exit { display: block; }
 
     <header class="mobile-header">
       <button id="menuButton" class="icon-button" aria-expanded="false" aria-controls="mobileNav">☰</button>
-      <button class="mobile-brand" data-view="dashboard">Holiday University</button>
+      <button class="mobile-brand" data-view="dashboard">Lantern Academy</button>
       <button id="focusButtonMobile" class="icon-button" aria-label="Toggle focus mode">◉</button>
     </header>
 
@@ -297,7 +337,11 @@ body.focus-mode .focus-exit { display: block; }
   </div>
 
   <nav id="mobileNav" class="mobile-nav" aria-label="Mobile navigation" hidden>
+    <button data-mode="curiosity">Curiosity Mode</button>
+    <button data-mode="professional">Professional Mode</button>
+    <button data-mode="blended">Blended Mode</button>
     <button data-view="dashboard">Base Camp</button>
+    <button data-view="professional">Professional</button>
     <button data-view="faculties">Faculties</button>
     <button data-view="catalogue">Courses</button>
     <button data-view="cabinet">Cabinet</button>
@@ -389,6 +433,56 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   "use strict";
 
   const DATA = window.HU_DATA;
+  const PROFESSIONAL_MODULES = [
+    {id:"p1",title:"AI for Real Work",area:"AI & judgement",time:"90–150 min",summary:"Choose, prompt and check AI tools without outsourcing your judgement.",goal:"Use AI to improve one real task while keeping a clear human decision point.",lessons:[
+      {title:"Start with the job, not the tool",text:"AI is most useful when the task is named precisely. Separate the work into inputs, transformation, decision and output. Generative AI can often help with transformation—summarising, structuring, drafting, comparing or generating options. It should not silently inherit decisions about truth, fairness, safeguarding or people. A good use case is frequent enough to matter, bounded enough to test, and reversible if the result is poor."},
+      {title:"Prompt as a working brief",text:"A reliable prompt states the role of the output, the audience, the source material, the constraints and the required format. Ask the system to identify uncertainty and missing information. For important work, generate a draft and then run a separate review pass against explicit criteria. Fluency is not evidence: verify names, dates, figures, quotations, policy claims and anything that could affect a person."},
+      {title:"Keep the human checkpoint",text:"Record what data entered the tool, what it produced, what you checked and what you changed. Avoid entering confidential or identifying information unless the organisation has explicitly approved the tool and process. The useful question is not “Can AI do this?” but “Where does it add speed or perspective without weakening consent, accountability or care?”"}],tasks:["Name one repeated task and its real purpose","Mark the human decision points","Draft and test one reusable prompt","Verify the result against source material"],outputPrompt:"Create a reusable AI working brief for one task. Include purpose, inputs, prompt, checks, risks and the final human decision.",evidencePrompt:"What changed between the AI output and the version you would actually use?",workUse:"Run the brief once on a low-risk task and note the time saved and quality difference."},
+    {id:"p2",title:"Human-Centred Digital Inclusion",area:"Digital inclusion",time:"75–120 min",summary:"Design support around confidence, access and dignity—not imagined ‘basic users’.",goal:"Improve one digital activity so more people can complete it independently.",lessons:[
+      {title:"Barriers are layered",text:"A person may face device, connectivity, cost, literacy, language, disability, confidence, trust or previous-harm barriers at the same time. “Lack of skills” is often the least useful diagnosis. Observe the exact point where progress stops and distinguish what the person cannot yet do from what the service has made unnecessarily difficult."},
+      {title:"Teach the transferable pattern",text:"Demonstrating a sequence can complete today’s task while leaving tomorrow’s problem untouched. Name the pattern underneath it: finding settings, recognising a trustworthy sender, recovering from an error, uploading a file or checking where information will go. Use plain language, visible steps, practice and a chance for the learner to repeat the task without rescue."},
+      {title:"Design for dignity",text:"Consent matters when touching someone’s device or viewing personal information. Ask before taking over, narrate what you are doing, and return control quickly. Build low-pressure alternatives and never make speed the measure of competence. Successful inclusion increases agency: the person understands more, chooses more and depends on you less."}],tasks:["Map the layered barriers in one real activity","Identify the transferable digital pattern","Rewrite the instructions in plain language","Add a safe practice and recovery step"],outputPrompt:"Redesign one digital-support activity as an accessible learner journey with preparation, demonstration, practice, recovery and independence checks.",evidencePrompt:"Which barrier did you initially mistake for a skills problem?",workUse:"Use the redesigned activity with one learner or colleague and record where they still hesitate."},
+    {id:"p3",title:"Designing Learning That Sticks",area:"Learning design",time:"90–150 min",summary:"Turn information into a session people can understand, practise and reuse.",goal:"Build one complete session around a meaningful change in what learners can do.",lessons:[
+      {title:"Begin with the exit",text:"A topic is not an outcome. “Learn about online safety” is too foggy to design or assess. Describe what learners will be able to notice, decide, make or do by the end. Choose one essential outcome, then remove content that does not serve it. Depth usually beats the frantic buffet of seventeen tips."},
+      {title:"Sequence for confidence",text:"A useful sequence is connect, model, practise, reflect and transfer. Connect the task to existing experience. Model both the action and the thinking behind it. Let learners practise with support, then independently. Reflection names what changed; transfer asks where the same pattern appears next."},
+      {title:"Check learning without school theatre",text:"Use authentic evidence: demonstrate the action, explain a choice, repair an error, compare two examples or create a usable output. Questions such as “Does that make sense?” mostly measure politeness. Plan a low-pressure check that reveals whether the learner can act without being embarrassed for still learning."}],tasks:["Write one observable learning outcome","Choose the minimum useful content","Plan modelled and independent practice","Create an authentic closing check"],outputPrompt:"Create a complete session plan: outcome, opening, explanation, demonstration, practice, adaptation, assessment and take-away resource.",evidencePrompt:"What did you deliberately leave out, and why did that improve the session?",workUse:"Deliver or rehearse the session, then revise one section using observed evidence."},
+    {id:"p4",title:"Employability Programme Design",area:"Employability",time:"2–3 hours",summary:"Build programmes that develop agency and evidence, not just compliant paperwork.",goal:"Map a programme from participant starting points to meaningful next steps.",lessons:[
+      {title:"Start with the person and the labour market",text:"Employability is shaped by confidence, health, caring, transport, discrimination, digital access, qualifications, experience and local opportunity. A useful programme joins personal agency with realistic labour-market knowledge. It avoids implying that attitude alone can solve structural barriers."},
+      {title:"Build a progression spine",text:"Sequence outcomes from engagement and self-knowledge through exploration, skill practice, evidence creation, applications and sustained next steps. Not every participant begins at the same point or needs the same destination. Make multiple routes visible and allow revisiting rather than treating progress as a conveyor belt."},
+      {title:"Create evidence through action",text:"Worksheets can support thought, but portfolios become stronger when participants research a role, practise a conversation, solve a work scenario, produce a document or complete a small project. Each activity should create evidence the participant can name: a skill used, a decision made, feedback applied or a barrier navigated."}],tasks:["Define the participant groups and starting points","Map soft and hard outcomes","Sequence activities into a progression spine","Choose useful evidence for each stage"],outputPrompt:"Draft a programme map with entry routes, six learning stages, activities, evidence, adaptations and possible exits or progressions.",evidencePrompt:"Where does your design protect participant choice rather than forcing one definition of success?",workUse:"Test the map against three different participant stories and revise any route that becomes unrealistic."},
+    {id:"p5",title:"Workflow Mapping & Simplification",area:"Systems",time:"75–120 min",summary:"See the real process, find friction and design a calmer version.",goal:"Simplify one repeated workflow without losing essential controls.",lessons:[
+      {title:"Map reality before aspiration",text:"Document what actually happens from trigger to finish: people, hand-offs, systems, decisions, waiting, rework and exceptions. The official process is often a tasteful work of fiction. Ask where information first appears, where it is copied, who waits, how errors are discovered and what happens when the normal route fails."},
+      {title:"Find the costly friction",text:"Look for duplicate entry, unclear ownership, hidden queues, unnecessary approvals, inconsistent naming and work that depends on one person remembering. Not all friction is waste; some protects quality, privacy or accountability. Name the purpose of each control before removing it."},
+      {title:"Design the smallest better system",text:"Simplify the route, define ownership and make status visible. Standardise inputs before automating outputs. Add automation only where the rule is stable and exceptions are understood. A successful redesign reduces cognitive load and failure demand, not merely the number of clicks on the happy path."}],tasks:["Map the current workflow end to end","Mark waiting, duplication and ambiguity","Separate protective controls from accidental friction","Draw the smallest workable future flow"],outputPrompt:"Produce a current-state and future-state workflow with owners, triggers, decisions, exceptions and three measures of improvement.",evidencePrompt:"Which problem was caused by the system rather than the person using it?",workUse:"Trial one reversible change for a week and compare errors, time or follow-up requests."},
+    {id:"p6",title:"Automation with Guardrails",area:"Automation",time:"90–150 min",summary:"Automate reliable rules while preserving visibility, recovery and human judgement.",goal:"Design one safe automation with a clear exception path.",lessons:[
+      {title:"Automate the stable middle",text:"Good automation begins with a clear trigger, dependable inputs and a repeatable rule. If people cannot agree on the process, automation will industrialise the confusion. Start with low-risk movement of information, reminders, formatting or status updates before automating decisions that affect people."},
+      {title:"Design failure on purpose",text:"Ask what happens when data is missing, duplicated, late or wrong; when an account changes; or when the external service is unavailable. Define who is notified, where the failed item waits and how it can be replayed without creating duplicates. An invisible failure is more dangerous than a manual delay."},
+      {title:"Keep an audit trail",text:"Record the trigger, action, time, relevant identifier and result. Minimise personal data, restrict access and define retention. Review automations because the world around a stable rule will eventually change. Ownership must belong to a role or team, not to the memory of whoever built the clever little thing."}],tasks:["Choose a stable low-risk process","Write trigger, conditions and actions","List at least five failure cases","Design alerts, recovery and ownership"],outputPrompt:"Create an automation blueprint with data map, happy path, exception path, privacy controls, audit record, owner and review date.",evidencePrompt:"What must remain visible or human even after the automation works?",workUse:"Build or simulate the smallest version using test data, then deliberately make it fail."},
+    {id:"p7",title:"Evidence, Outcomes & Reporting",area:"Impact",time:"90–150 min",summary:"Collect evidence that helps decisions instead of feeding the spreadsheet beast for sport.",goal:"Create a proportionate evidence plan for one service or project.",lessons:[
+      {title:"Separate activity from change",text:"Attendance, sessions and resources are outputs: they show what happened. Outcomes describe a change in knowledge, confidence, behaviour, access, circumstance or agency. Impact is the wider or longer-term difference to which the work contributes. Do not claim causation your evidence cannot support."},
+      {title:"Use a small mixed picture",text:"Combine a few useful numbers with structured qualitative evidence. Baselines, follow-ups, observation, work samples, short reflections and case stories each reveal different things. Collect only data you can explain, protect and use. More fields rarely rescue a vague question."},
+      {title:"Report for a decision",text:"A report should help someone understand reach, quality, change, variation, limitations and next action. Show denominators and missing data. Include what did not work and who may not have benefited. Ethical reporting treats people as participants in change, not heart-warming content units."}],tasks:["Write the outcome you genuinely influence","Choose indicators and a baseline","Plan quantitative and qualitative evidence","Name limitations and the decision the report supports"],outputPrompt:"Build a one-page evidence framework: outcome, indicators, sources, timing, responsibility, consent, analysis and reporting use.",evidencePrompt:"Which current measure looks impressive but tells you very little?",workUse:"Apply the framework to existing data and identify one collection habit to stop, start or change."},
+    {id:"p8",title:"Responsible Data & Charity Systems",area:"Governance",time:"90–150 min",summary:"Handle information with purpose, restraint and workable accountability.",goal:"Improve one information process so data is useful, secure and proportionate.",lessons:[
+      {title:"Purpose before collection",text:"For every field, ask why it is needed, who uses it, how long it remains useful and what harm disclosure could cause. Collecting information “just in case” creates cost and risk. Data minimisation makes systems easier to maintain and explanations easier to give."},
+      {title:"Access is a design decision",text:"Define access by role and task. Shared accounts, sprawling spreadsheets and mystery folders make accountability theatrical. Use clear ownership, consistent locations, secure sharing and a route for correcting records. Sensitive information deserves extra separation and scrutiny."},
+      {title:"Retention includes deletion",text:"Set practical review and deletion points, including copies, exports and old devices. Document lawful and organisational requirements rather than guessing. Prepare for incidents: recognise, contain, record, assess and escalate. A policy matters only if ordinary practice can follow it on a busy Tuesday."}],tasks:["Inventory data in one workflow","Name purpose, owner and access for each item","Set retention and deletion rules","Map the response to an error or disclosure"],outputPrompt:"Create a practical data-handling map for one workflow, including collection, access, storage, sharing, retention, deletion and incident response.",evidencePrompt:"What information are you keeping because nobody has decided to stop?",workUse:"Remove or secure one unnecessary copy and document the improved process."},
+    {id:"p9",title:"Facilitation & Difficult Rooms",area:"Facilitation",time:"75–120 min",summary:"Hold structure, participation and boundaries when a room becomes complicated.",goal:"Prepare and facilitate a session that can adapt without losing its purpose.",lessons:[
+      {title:"Design the container",text:"People participate more safely when purpose, timing, choices and boundaries are visible. Explain how contributions will be used and what confidentiality can and cannot mean. Offer several ways to take part: speaking, writing, pairs, anonymous input or passing."},
+      {title:"Read the room without mind-reading",text:"Notice observable patterns: who has spoken, where energy changed, which question produced silence and whether the task is clear. Check your interpretation. Silence may mean thinking, confusion, caution, fatigue or disagreement. Adjust pace or method while keeping the outcome in view."},
+      {title:"Respond to difficulty",text:"Acknowledge tension, restate the shared task and separate a person from a harmful contribution. Use boundaries where safety or dignity is threatened. Do not force disclosure or turn the group into therapy. Afterward, record what happened, follow safeguarding routes where needed and review the design rather than merely blaming personalities."}],tasks:["Write a clear opening contract","Plan three participation routes","Prepare responses to likely difficult moments","Design a closing and follow-up"],outputPrompt:"Create a facilitation plan with purpose, agreements, participation design, timing, adaptation points, boundary phrases and follow-up actions.",evidencePrompt:"What will you observe to decide whether the room needs more structure or more space?",workUse:"Use one new participation method and record whose contribution became possible because of it."},
+    {id:"p10",title:"Digital Strategy for Small Organisations",area:"Strategy",time:"2–3 hours",summary:"Choose a coherent digital direction from real needs, capacity and risk.",goal:"Create a practical twelve-month digital roadmap for a small organisation or project.",lessons:[
+      {title:"Strategy is a set of choices",text:"A software shopping list is not a strategy. Begin with mission, users, current pain, evidence and constraints. Decide which capabilities matter: communication, service access, collaboration, information, reporting, security or automation. Name what will not be prioritised yet."},
+      {title:"Design around operating capacity",text:"Every tool creates work: setup, learning, support, permissions, maintenance, renewal, export and eventual replacement. Assess skills, ownership, budget, connectivity and change fatigue. The theoretically powerful system that nobody can sustain is simply a future archaeological site."},
+      {title:"Roadmap outcomes, not installations",text:"Sequence foundations before features: ownership, data hygiene, access, standard processes and training. Give each initiative a problem statement, outcome, owner, dependencies, measure and review point. Use pilots and reversible steps where uncertainty is high."}],tasks:["Define mission-linked digital outcomes","Audit pain, risk and capacity","Choose three priorities and explicit non-priorities","Sequence a twelve-month roadmap"],outputPrompt:"Draft a digital strategy on one page plus a twelve-month roadmap with outcomes, initiatives, owners, dependencies, measures and review points.",evidencePrompt:"Which attractive tool or idea should wait, and what foundation is missing?",workUse:"Discuss the roadmap with one stakeholder and revise it around the strongest disagreement."},
+    {id:"p11",title:"Consulting: Discovery to Recommendation",area:"Consulting",time:"2–3 hours",summary:"Turn a messy client problem into grounded findings and implementable choices.",goal:"Run a small discovery and produce a recommendation someone can act on.",lessons:[
+      {title:"Discover before prescribing",text:"Clarify the decision, stakeholders, symptoms, history, constraints and definition of better. Interview for examples rather than opinions alone: “Tell me about the last time.” Review artefacts and observe the process. Treat the initial request as a hypothesis; clients often ask for a tool when the underlying issue is ownership, workflow or information."},
+      {title:"Synthesize patterns",text:"Separate evidence, interpretation and assumption. Group findings around user needs, process, technology, governance and capacity. Look for contradictions because different roles experience different systems. Prioritise by impact, frequency, risk and feasibility rather than by who spoke most confidently."},
+      {title:"Recommend with choices",text:"State the finding, why it matters, the recommendation, effort, risk, owner and first step. Offer options where there is a genuine trade-off. A useful recommendation fits capacity and makes the next decision easier. Include what you would not recommend and why."}],tasks:["Write the discovery question","Gather evidence from people, process and artefacts","Synthesize findings without hiding uncertainty","Create prioritised recommendations with first steps"],outputPrompt:"Produce a concise discovery report: context, method, evidence, findings, options, recommendations, roadmap, risks and unanswered questions.",evidencePrompt:"Where did the evidence change your original diagnosis?",workUse:"Present the recommendation in ten minutes and note which decision the listener still cannot make."},
+    {id:"p12",title:"Building Reusable Digital Resources",area:"Resource design",time:"90–150 min",summary:"Create guides, templates and tools that remain usable after you leave the room.",goal:"Build one accessible reusable resource and test it with a real user.",lessons:[
+      {title:"Design for the moment of use",text:"Define who will use the resource, what they are trying to do, what they already know and what device or setting they are likely to have. A training handout, live checklist, troubleshooting guide and template solve different moments. Pick one primary job."},
+      {title:"Make the path visible",text:"Use descriptive headings, short steps, meaningful examples and consistent terms. Explain choices and recovery, not only the perfect sequence. Keep screenshots purposeful because interfaces change. Build accessibility into structure, contrast, text size, link labels, reading order and alternatives."},
+      {title:"Test comprehension, not admiration",text:"Ask someone to use the resource without coaching. Observe where they pause, misinterpret or search. Ask them to explain what they would do next. Revise the resource, then record owner, version, source links and a review date so it does not become confidently obsolete."}],tasks:["Define user, moment and single job","Create the shortest complete route","Add accessibility and recovery guidance","Test without rescuing and revise"],outputPrompt:"Create a reusable resource specification and first draft, including audience, purpose, structure, accessibility, test notes, owner, version and review date.",evidencePrompt:"Where did the user’s behaviour contradict your assumption about clarity?",workUse:"Publish or use the revised resource once, then schedule its first content review."}
+  ];
   const STORAGE_KEY = "holiday-university-os-state-v1";
   const milestoneNames = {
     question: "Question answered",
@@ -409,14 +503,17 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   let toastTimer = null;
 
   const defaults = {
-    version: 1,
+    version: 2,
+    studyMode: "curiosity",
     currentView: "dashboard",
     currentCourse: null,
+    currentProfessional: null,
     currentTab: "lecture",
     selectedCapacity: "glimmer",
     catalogueFaculty: "all",
     catalogueQuery: "",
     progress: {},
+    professionalProgress: {},
     cabinet: [],
     commonplace: [],
     recent: [],
@@ -425,12 +522,16 @@ if(__exports != exports)module.exports = exports;return module.exports}));
 
   let state = loadState();
 
+  function freshDefaults() {
+    return { ...defaults, progress: {}, professionalProgress: {}, cabinet: [], commonplace: [], recent: [], matriculatedAt: new Date().toISOString() };
+  }
+
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      return saved ? { ...defaults, ...saved } : { ...defaults };
+      return saved ? { ...freshDefaults(), ...saved } : freshDefaults();
     } catch (_) {
-      return { ...defaults };
+      return freshDefaults();
     }
   }
 
@@ -451,12 +552,30 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   }
 
   function uid() {
-    return window.crypto?.randomUUID?.() || `hu-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    return window.crypto?.randomUUID?.() || `la-${Date.now()}-${Math.random().toString(16).slice(2)}`;
   }
 
   function markdown(value = "") {
     if (!value.trim()) return '<p class="muted">This room is awaiting its first entry.</p>';
-    return window.marked.parse(value, { gfm: true, breaks: false });
+    return window.marked.parse(value.replace(/Holiday University/gi, "Lantern Academy"), { gfm: true, breaks: false });
+  }
+
+  function professionalProgressFor(moduleId) {
+    if (!state.professionalProgress[moduleId]) state.professionalProgress[moduleId] = {
+      priority: "medium", deadline: "", tasks: {}, output: "", evidence: "", notes: "", ink: {}, lastVisited: null, completed: false
+    };
+    if (!state.professionalProgress[moduleId].ink) state.professionalProgress[moduleId].ink = {};
+    return state.professionalProgress[moduleId];
+  }
+
+  function professionalPercent(moduleId) {
+    const p = state.professionalProgress[moduleId];
+    if (!p) return 0;
+    const module = PROFESSIONAL_MODULES.find(item => item.id === moduleId);
+    const taskTotal = module?.tasks.length || 1;
+    const tasks = Object.values(p.tasks || {}).filter(Boolean).length / taskTotal;
+    const sections = [tasks >= 1, Boolean(p.output?.trim()), Boolean(p.evidence?.trim()), Boolean(p.completed)];
+    return Math.round(sections.filter(Boolean).length / sections.length * 100);
   }
 
   function progressFor(courseId) {
@@ -531,6 +650,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     document.body.classList.remove("focus-mode");
     state.currentView = view;
     if (options.courseId) state.currentCourse = options.courseId;
+    if (options.professionalId) state.currentProfessional = options.professionalId;
     if (options.tab) state.currentTab = options.tab;
     saveState();
     render();
@@ -544,12 +664,16 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   }
 
   function render() {
+    document.body.dataset.mode = state.studyMode;
+    document.querySelectorAll("button[data-mode]").forEach(button => button.classList.toggle("active", button.dataset.mode === state.studyMode));
     document.querySelectorAll(".primary-nav button").forEach(button => button.classList.toggle("active", button.dataset.view === state.currentView));
     const renderers = {
       dashboard: renderDashboard,
       faculties: renderFaculties,
       catalogue: renderCatalogue,
       course: renderCourse,
+      professional: renderProfessionalStudio,
+      professionalCourse: renderProfessionalCourse,
       cabinet: renderCabinet,
       commonplace: renderCommonplace,
       transcript: renderTranscript,
@@ -561,8 +685,10 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       link.rel = "noopener noreferrer";
     });
     document.title = state.currentView === "course" && courseById[state.currentCourse]
-      ? `${courseById[state.currentCourse].code} ${courseById[state.currentCourse].title} — Holiday University`
-      : "Holiday University";
+      ? `${courseById[state.currentCourse].code} ${courseById[state.currentCourse].title} — Lantern Academy`
+      : state.currentView === "professionalCourse" && state.currentProfessional
+        ? `${PROFESSIONAL_MODULES.find(item => item.id === state.currentProfessional)?.title || "Professional Studio"} — Lantern Academy`
+        : "Lantern Academy";
     requestAnimationFrame(initInkCanvases);
   }
 
@@ -573,6 +699,50 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   }
 
   function renderDashboard() {
+    if (state.studyMode === "professional") return renderProfessionalDashboard();
+    if (state.studyMode === "blended") return renderBlendedDashboard();
+    return renderCuriosityDashboard();
+  }
+
+  function modeBanner(label, copy) {
+    return `<div class="mode-banner"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(copy)}</span></div>`;
+  }
+
+  function nextProfessionalModule() {
+    return [...PROFESSIONAL_MODULES].sort((a,b) => {
+      const pa = professionalProgressFor(a.id), pb = professionalProgressFor(b.id);
+      const weight = value => value === "high" ? 0 : value === "medium" ? 1 : 2;
+      return Number(pa.completed) - Number(pb.completed) || weight(pa.priority) - weight(pb.priority) || (pa.deadline || "9999").localeCompare(pb.deadline || "9999");
+    })[0];
+  }
+
+  function renderProfessionalDashboard() {
+    const active = PROFESSIONAL_MODULES.filter(module => state.professionalProgress[module.id]?.lastVisited && !state.professionalProgress[module.id]?.completed);
+    const completed = PROFESSIONAL_MODULES.filter(module => state.professionalProgress[module.id]?.completed).length;
+    const next = nextProfessionalModule();
+    return `<div class="page">${modeBanner("Professional Mode","Applied learning, real outputs and evidence you can carry into your work.")}
+      ${pageHeader("Professional Base Camp","Build capability, then use it", "Choose a pathway, create the actual output and record what changed.", '<button class="btn" data-view="professional">Open Professional Studio</button>')}
+      <section class="grid stats-grid"><div class="card stat"><span>Pathways available</span><strong>12</strong></div><div class="card stat"><span>In progress</span><strong>${active.length}</strong></div><div class="card stat"><span>Completed</span><strong>${completed}</strong></div><div class="card stat"><span>Outputs created</span><strong>${Object.values(state.professionalProgress).filter(p => p.output?.trim()).length}</strong></div></section>
+      <section class="capacity-card"><p class="eyebrow">Best next move</p><h2>${escapeHtml(next.title)}</h2><p>${escapeHtml(next.summary)}</p><div class="professional-meta"><span class="tag">${escapeHtml(next.area)}</span><span class="tag">${escapeHtml(next.time)}</span><span class="tag priority-${professionalProgressFor(next.id).priority}">${escapeHtml(professionalProgressFor(next.id).priority)} priority</span></div><button class="btn btn-primary" data-professional="${next.id}">Continue pathway</button></section>
+      <div class="section-heading"><h2>Active pathways</h2></div><section class="grid professional-grid">${active.length ? active.slice(0,3).map(renderProfessionalCard).join("") : '<div class="empty">Choose a pathway when a real work question needs a little lanternlight.</div>'}</section>
+    </div>`;
+  }
+
+  function renderBlendedDashboard() {
+    const curiosity = todayRecommendation();
+    const professional = nextProfessionalModule();
+    const route = curiosity.routes[state.selectedCapacity];
+    return `<div class="page">${modeBanner("Blended Mode","One useful thread and one gloriously interesting thread. Both belong here.")}
+      ${pageHeader("The Crossing","Useful meets fascinating", "Choose either door—or take a little from both without creating homework debt.")}
+      <div class="blended-grid">
+        <section class="capacity-card" style="--faculty:${facultyColour(curiosity.faculty)}"><p class="eyebrow">Curiosity thread</p><h2>${escapeHtml(curiosity.code)} · ${escapeHtml(curiosity.title)}</h2><p>${escapeHtml(route.description)}</p><button class="btn btn-primary" data-course="${curiosity.id}" data-route="${state.selectedCapacity}">Follow curiosity</button></section>
+        <section class="capacity-card"><p class="eyebrow">Professional thread</p><h2>${escapeHtml(professional.title)}</h2><p>${escapeHtml(professional.summary)}</p><div class="professional-meta"><span class="tag">${escapeHtml(professional.area)}</span><span class="tag">${escapeHtml(professional.time)}</span></div><button class="btn btn-primary" data-professional="${professional.id}">Make something useful</button></section>
+      </div>
+      <div class="section-heading"><h2>Choose today’s curiosity depth</h2></div><div class="capacity-options">${routeOrder.map(key => `<button class="capacity-option ${state.selectedCapacity === key ? "selected" : ""}" data-capacity="${key}"><strong>${escapeHtml(DATA.courses[0].routes[key].label)}</strong><small>${key === "glimmer" ? "2–10 min" : key === "tea" ? "20–30 min" : key === "half" ? "60–120 min" : "Untimed"}</small></button>`).join("")}</div>
+    </div>`;
+  }
+
+  function renderCuriosityDashboard() {
     const complete = completedCourses().length;
     const visited = visitedCourses().length;
     const discoveries = state.commonplace.length;
@@ -581,6 +751,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     const recent = state.recent.map(id => courseById[id]).filter(Boolean).slice(0, 3);
     const route = recommendation.routes[state.selectedCapacity];
     return `<div class="page">
+      ${modeBanner("Curiosity Mode","No grades, no guilt, no demand that every interesting door become productive.")}
       ${pageHeader("Base Camp", "Welcome back, Explorer", "Choose the amount of curiosity that fits today. A glimmer counts as study.", '<button class="btn" data-view="catalogue">Browse all 48 courses</button>')}
       <section class="grid stats-grid" aria-label="University progress">
         <div class="card stat"><span>Courses visited</span><strong>${visited}<small class="muted"> / 48</small></strong></div>
@@ -636,6 +807,56 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     </div>`;
   }
 
+  function renderProfessionalCard(module, index = PROFESSIONAL_MODULES.indexOf(module)) {
+    const p = professionalProgressFor(module.id);
+    const percent = professionalPercent(module.id);
+    return `<button class="card professional-card" data-professional="${module.id}"><span class="module-number">${String(index + 1).padStart(2,"0")}</span><span class="faculty-meta">${escapeHtml(module.area)}</span><h3>${escapeHtml(module.title)}</h3><p>${escapeHtml(module.summary)}</p><div class="professional-meta"><span class="tag">${escapeHtml(module.time)}</span><span class="tag priority-${p.priority}">${escapeHtml(p.priority)} priority</span>${p.deadline ? `<span class="tag">Due ${escapeHtml(new Date(`${p.deadline}T12:00:00`).toLocaleDateString("en-GB",{day:"numeric",month:"short"}))}</span>` : ""}</div><span class="progress-pill ${p.completed ? "complete" : ""}">${percent}%</span></button>`;
+  }
+
+  function renderProfessionalStudio() {
+    const completed = PROFESSIONAL_MODULES.filter(module => state.professionalProgress[module.id]?.completed).length;
+    return `<div class="page">${modeBanner("Professional Studio","Practical pathways for digital inclusion, learning design, systems, AI and consulting.")}
+      ${pageHeader("Professional Faculty","Applied learning pathways", "Each pathway contains its core reading, tasks, a real work output and CPD evidence.")}
+      <section class="card" style="margin-bottom:22px"><div class="section-heading" style="margin:0"><div><p class="eyebrow">Professional record</p><h3>${completed} of 12 pathways completed</h3></div><button class="btn" data-view="transcript">Open Academy record</button></div></section>
+      <section class="grid professional-grid">${PROFESSIONAL_MODULES.map(renderProfessionalCard).join("")}</section>
+    </div>`;
+  }
+
+  function renderProfessionalCourse() {
+    const module = PROFESSIONAL_MODULES.find(item => item.id === state.currentProfessional) || PROFESSIONAL_MODULES[0];
+    state.currentProfessional = module.id;
+    const p = professionalProgressFor(module.id);
+    p.lastVisited = new Date().toISOString();
+    const percent = professionalPercent(module.id);
+    const pageSurface = `professional:${module.id}:fullpage`;
+    return `<div class="page professional-page annotation-stage full-page-annotation ${inkState(pageSurface, true).enabled ? "ink-enabled" : ""} ${inkState(pageSurface, true).visible ? "" : "ink-hidden"}" data-ink-container="${pageSurface}">
+      <div class="full-page-ink"><p>Full-page Pencil layer</p>${renderInkToolbar(pageSurface, true)}</div>
+      <button class="back-link" data-view="professional">← Return to Professional Studio</button>
+      <header class="professional-hero"><p class="eyebrow">${escapeHtml(module.area)} · Applied pathway</p><h1>${escapeHtml(module.title)}</h1><p class="lede" style="color:#e4dcd1">${escapeHtml(module.goal)}</p></header>
+      <div class="professional-layout">
+        <article class="reading-panel">
+          ${renderInkToolbar(`professional:${module.id}:reading`, true)}
+          <div class="annotation-stage ${inkState(`professional:${module.id}:reading`, true).enabled ? "ink-enabled" : ""} ${inkState(`professional:${module.id}:reading`, true).visible ? "" : "ink-hidden"}" data-ink-container="professional:${module.id}:reading"><div class="annotation-content"><p class="eyebrow">Core reading</p><h2>Learn the working principles</h2>${module.lessons.map((lesson,index) => `<section class="lesson-block"><p class="eyebrow">Principle ${index + 1}</p><h3>${escapeHtml(lesson.title)}</h3><p>${escapeHtml(lesson.text)}</p></section>`).join("")}</div><canvas class="ink-canvas annotation-canvas" data-ink-surface="professional:${module.id}:reading" aria-label="Professional reading annotation layer"></canvas></div>
+          <section class="card work-output"><p class="eyebrow">Apply it</p><h2>Build the real output</h2><p>${escapeHtml(module.outputPrompt)}</p><div class="field"><label for="professionalOutput">Your working output</label><textarea id="professionalOutput" data-professional-field="output" placeholder="Type here, dictate, or use Apple Pencil Scribble…">${escapeHtml(p.output)}</textarea></div></section>
+          <section class="card" style="margin-top:18px"><p class="eyebrow">CPD evidence</p><h2>Record what changed</h2><p>${escapeHtml(module.evidencePrompt)}</p><div class="field"><label for="professionalEvidence">Evidence and reflection</label><textarea id="professionalEvidence" data-professional-field="evidence">${escapeHtml(p.evidence)}</textarea></div><div class="field" style="margin-top:14px"><label for="professionalNotes">Notes, examples and connections</label><textarea id="professionalNotes" data-professional-field="notes">${escapeHtml(p.notes)}</textarea></div>${renderProfessionalInkPad(module.id)}</section>
+        </article>
+        <aside class="professional-side">
+          <section class="card"><p class="eyebrow">Pathway progress</p><h3>${percent}% complete</h3><div class="course-progress-track"><span style="width:${percent}%;background:#476058"></span></div></section>
+          <section class="card"><p class="eyebrow">Plan the work</p><div class="field"><label for="professionalPriority">Priority</label><select id="professionalPriority" data-professional-field="priority"><option value="low" ${p.priority === "low" ? "selected" : ""}>Low</option><option value="medium" ${p.priority === "medium" ? "selected" : ""}>Medium</option><option value="high" ${p.priority === "high" ? "selected" : ""}>High</option></select></div><div class="field" style="margin-top:12px"><label for="professionalDeadline">Useful by</label><input id="professionalDeadline" type="date" data-professional-field="deadline" value="${escapeHtml(p.deadline)}"></div></section>
+          <section class="card"><p class="eyebrow">Working steps</p><div class="task-checks">${module.tasks.map((task,index) => `<label><input type="checkbox" data-professional-task="${index}" ${p.tasks[index] ? "checked" : ""}><span>${escapeHtml(task)}</span></label>`).join("")}</div></section>
+          <section class="card"><p class="eyebrow">Use it at work</p><p>${escapeHtml(module.workUse)}</p></section>
+          <button class="btn ${p.completed ? "" : "btn-primary"}" data-professional-complete="${module.id}">${p.completed ? "✓ Pathway completed — reopen" : "Complete pathway"}</button>
+        </aside>
+      </div>
+      <canvas class="ink-canvas annotation-canvas full-page-canvas" data-ink-surface="${pageSurface}" aria-label="Full professional-pathway annotation layer"></canvas>
+    </div>`;
+  }
+
+  function renderProfessionalInkPad(moduleId) {
+    const surface = `professional:${moduleId}:notes`;
+    return `<section class="ink-pad" data-ink-container="${surface}"><h4>Handwritten working page</h4><p>Use Apple Pencil or a mouse. This page is saved with the pathway and included in backups.</p>${renderInkToolbar(surface)}<canvas class="ink-canvas" data-ink-surface="${surface}" aria-label="Handwritten professional notes"></canvas></section>`;
+  }
+
   function filteredCourses() {
     const query = state.catalogueQuery.trim().toLowerCase();
     return DATA.courses.filter(course => {
@@ -668,7 +889,9 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     const tab = state.currentTab || "lecture";
     const route = progress.route || "glimmer";
     const tabContent = renderCourseTab(course, progress, tab);
-    return `<div class="page course-page" style="--faculty:${facultyColour(course.faculty)}">
+    const pageSurface = `fullpage:${course.id}:${tab}`;
+    return `<div class="page course-page annotation-stage full-page-annotation ${inkState(pageSurface, true).enabled ? "ink-enabled" : ""} ${inkState(pageSurface, true).visible ? "" : "ink-hidden"}" data-ink-container="${pageSurface}" style="--faculty:${facultyColour(course.faculty)}">
+      <div class="full-page-ink"><p>Full-page Pencil layer</p>${renderInkToolbar(pageSurface, true)}</div>
       <button class="btn focus-exit" data-focus="off">Exit focus mode</button>
       <button class="back-link" data-view="catalogue">← Return to Course Registry</button>
       <header class="course-header">
@@ -702,6 +925,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
           <div class="button-row"><button class="btn btn-primary" data-focus="on">Enter Focus Mode</button><button class="btn" data-add-question="${course.id}">Carry this question</button></div>
         </aside>
       </div>
+      <canvas class="ink-canvas annotation-canvas full-page-canvas" data-ink-surface="${pageSurface}" aria-label="Full course-page annotation layer"></canvas>
     </div>`;
   }
 
@@ -755,9 +979,11 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   function renderTranscript() {
     const complete = completedCourses();
     const visits = visitedCourses().sort((a, b) => new Date(state.progress[b.id].lastVisited) - new Date(state.progress[a.id].lastVisited));
+    const professionalVisits = PROFESSIONAL_MODULES.filter(module => state.professionalProgress[module.id]?.lastVisited);
+    const professionalComplete = professionalVisits.filter(module => state.professionalProgress[module.id]?.completed);
     return `<div class="page">
-      ${pageHeader("Academic Records", "Passport of Discoveries", "A record of where curiosity took you—not a measurement of your worth.", '<button class="btn" onclick="window.print()">Print transcript</button>')}
-      <section class="card passport-summary"><div class="seal-large">${complete.length}</div><div><p class="eyebrow">Academic standing</p><h2>${complete.length ? "Scholar of active curiosity" : "Newly matriculated explorer"}</h2><p>${visits.length} course doors opened · ${complete.length} courses fully explored · ${state.commonplace.length} discoveries preserved.</p></div></section>
+      ${pageHeader("Academy Records", "Record of Discoveries & Practice", "Curiosity, capability and useful work—recorded without pretending your worth is a percentage.", '<button class="btn" onclick="window.print()">Print record</button>')}
+      <section class="card passport-summary"><div class="seal-large">${complete.length + professionalComplete.length}</div><div><p class="eyebrow">Lantern Academy standing</p><h2>${complete.length + professionalComplete.length ? "Scholar of active curiosity and practice" : "Newly admitted explorer"}</h2><p>${visits.length} curiosity courses visited · ${professionalVisits.length} professional pathways opened · ${state.commonplace.length} discoveries preserved.</p></div></section>
       <section class="card"><h2>Faculty stamps</h2><div class="faculty-progress">${DATA.faculties.map(faculty => {
         const count = faculty.courseIds.filter(id => coursePercent(id) === 100).length;
         return `<div class="faculty-progress-row" style="--faculty:${faculty.colour}"><strong>${escapeHtml(faculty.name)}</strong><div class="track"><span style="width:${count / 8 * 100}%"></span></div><span>${count}/8</span></div>`;
@@ -767,6 +993,11 @@ if(__exports != exports)module.exports = exports;return module.exports}));
         const p = state.progress[course.id];
         return `<button class="course-row" data-course="${course.id}" style="--faculty:${facultyColour(course.faculty)};text-align:left"><span class="course-code">${course.code}</span><span><strong>${escapeHtml(course.title)}</strong><small>${escapeHtml(p.passport || p.surprise || "Visit recorded")}</small></span><span class="progress-pill ${coursePercent(course.id) === 100 ? "complete" : ""}">${coursePercent(course.id)}%</span></button>`;
       }).join("") : '<div class="empty">Open a course and record a visit to begin your transcript.</div>'}</section>
+      <div class="section-heading"><h2>Professional record</h2><button class="btn" data-view="professional">Open Professional Studio</button></div>
+      <section class="course-list">${professionalVisits.length ? professionalVisits.map(module => {
+        const p = professionalProgressFor(module.id);
+        return `<button class="course-row" data-professional="${module.id}" style="--faculty:#476058;text-align:left"><span class="course-code">◆</span><span><strong>${escapeHtml(module.title)}</strong><small>${escapeHtml(p.evidence || p.output || "Pathway opened")}</small></span><span class="progress-pill ${p.completed ? "complete" : ""}">${professionalPercent(module.id)}%</span></button>`;
+      }).join("") : '<div class="empty">Your applied pathways, outputs and CPD reflections will appear here.</div>'}</section>
     </div>`;
   }
 
@@ -775,12 +1006,12 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     return `<div class="page">
       ${pageHeader("System Office", "Settings & backup", "Your work is stored on this device. Export a backup to move it or keep it safe.")}
       <section class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
-        <div class="card"><p class="eyebrow">Install</p><h3>Make it feel like an app</h3><p class="muted">Install Holiday University from your browser for a full-screen icon and offline access.</p><button id="installButton" class="btn btn-primary" ${deferredInstallPrompt ? "" : "disabled"}>${deferredInstallPrompt ? "Install University OS" : "Use your browser's Add to Home Screen"}</button></div>
+        <div class="card"><p class="eyebrow">Install</p><h3>Make it feel like an app</h3><p class="muted">Install Lantern Academy from your browser for a full-screen icon and offline access.</p><button id="installButton" class="btn btn-primary" ${deferredInstallPrompt ? "" : "disabled"}>${deferredInstallPrompt ? "Install Lantern Academy" : "Use your browser's Add to Home Screen"}</button></div>
         <div class="card"><p class="eyebrow">Backup</p><h3>Carry your university</h3><p class="muted">Current private study record: approximately ${savedKb} KB.</p><div class="button-row"><button class="btn btn-primary" data-export>Export backup</button><button class="btn" data-import>Import backup</button></div></div>
         <div class="card"><p class="eyebrow">Offline</p><h3>Downloaded campus</h3><p class="muted">The 48 course lectures and app interface are included. External video, audio and article links still require internet.</p><button class="btn" data-refresh-cache>Refresh offline copy</button></div>
         <div class="card"><p class="eyebrow">Private records</p><h3>Begin again</h3><p class="muted">This permanently removes local notes, answers and progress from this device. Export first if uncertain.</p><button class="btn" data-reset>Erase local study record</button></div>
       </section>
-      <section class="card" style="margin-top:20px"><h2>What is inside this edition</h2><p>Six faculties · 48 complete course portals · full Grand Edition lecture notes · route selection · field activities · integrated notes · Curiosity Cabinet · Commonplace Book · Academic Passport · offline caching · backup and restore.</p><p class="muted small">Release ${DATA.version}. Automatic account-based device sync is not part of this local-first release.</p></section>
+      <section class="card" style="margin-top:20px"><h2>What is inside this edition</h2><p>Three study modes · six curiosity faculties · 48 complete course portals · 12 applied professional pathways · integrated reading, tasks, work outputs, Pencil notes, Curiosity Cabinet, Commonplace Book, Academy record, offline caching, backup and restore.</p><p class="muted small">Lantern Academy release 2.0. Automatic account-based device sync is not part of this local-first release.</p></section>
     </div>`;
   }
 
@@ -797,6 +1028,20 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     if (route) progress.route = route;
     markVisited(courseId);
     setView("course", { courseId, tab: "lecture" });
+  }
+
+  function openProfessional(moduleId) {
+    const progress = professionalProgressFor(moduleId);
+    progress.lastVisited = new Date().toISOString();
+    state.currentProfessional = moduleId;
+    setView("professionalCourse", { professionalId: moduleId });
+  }
+
+  function updateProfessionalField(element) {
+    const progress = professionalProgressFor(state.currentProfessional);
+    progress[element.dataset.professionalField] = element.value;
+    progress.lastVisited = new Date().toISOString();
+    saveState();
   }
 
   function openFaculty(name) {
@@ -826,7 +1071,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   }
 
   function inkRecords(surface) {
-    const progress = progressFor(state.currentCourse);
+    const progress = surface.startsWith("professional:") ? professionalProgressFor(state.currentProfessional) : progressFor(state.currentCourse);
     return progress.ink[surface] || (progress.ink[surface] = []);
   }
 
@@ -870,7 +1115,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   }
 
   function initInkCanvases() {
-    if (state.currentView !== "course") return;
+    if (!["course","professionalCourse"].includes(state.currentView)) return;
     document.querySelectorAll("[data-ink-surface]").forEach(canvas => {
       sizeInkCanvas(canvas);
       if (window.ResizeObserver) new ResizeObserver(() => sizeInkCanvas(canvas)).observe(canvas);
@@ -894,8 +1139,9 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       const finish = () => {
         if (!stroke) return;
         stroke = null;
-        const progress = progressFor(state.currentCourse);
-        if (canvas.dataset.inkSurface === "answer:doorAnswer") progress.milestones.question = true;
+        const professional = canvas.dataset.inkSurface.startsWith("professional:");
+        const progress = professional ? professionalProgressFor(state.currentProfessional) : progressFor(state.currentCourse);
+        if (!professional && canvas.dataset.inkSurface === "answer:doorAnswer") progress.milestones.question = true;
         progress.lastVisited = new Date().toISOString();
         saveState("Handwriting saved.");
       };
@@ -929,7 +1175,10 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       if (action?.dataset.inkAction === "toggle") setting.enabled = !setting.enabled;
       if (action?.dataset.inkAction === "visibility") setting.visible = !setting.visible;
       if (action?.dataset.inkAction === "undo") inkRecords(surface).pop();
-      if (action?.dataset.inkAction === "clear" && inkRecords(surface).length && confirm("Clear all handwriting on this area?")) progressFor(state.currentCourse).ink[surface] = [];
+      if (action?.dataset.inkAction === "clear" && inkRecords(surface).length && confirm("Clear all handwriting on this area?")) {
+        const progress = surface.startsWith("professional:") ? professionalProgressFor(state.currentProfessional) : progressFor(state.currentCourse);
+        progress.ink[surface] = [];
+      }
       updateInkToolbar(inkToolbar, surface);
       const canvas = findInkElement("data-ink-surface", surface);
       if (canvas) drawInk(canvas);
@@ -937,8 +1186,28 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       return;
     }
 
+    const modeButton = event.target.closest("button[data-mode]");
+    if (modeButton) {
+      state.studyMode = modeButton.dataset.mode;
+      state.currentView = "dashboard";
+      saveState("Study mode changed.");
+      return render();
+    }
+
     const viewButton = event.target.closest("[data-view]");
     if (viewButton) return setView(viewButton.dataset.view);
+
+    const professionalButton = event.target.closest("[data-professional]");
+    if (professionalButton) return openProfessional(professionalButton.dataset.professional);
+
+    const professionalComplete = event.target.closest("[data-professional-complete]");
+    if (professionalComplete) {
+      const p = professionalProgressFor(professionalComplete.dataset.professionalComplete);
+      p.completed = !p.completed;
+      p.lastVisited = new Date().toISOString();
+      saveState(p.completed ? "Pathway added to your professional record." : "Pathway reopened.");
+      return render();
+    }
 
     const courseButton = event.target.closest("[data-course]");
     if (courseButton) return openCourse(courseButton.dataset.course, courseButton.dataset.route);
@@ -1046,6 +1315,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
 
   document.addEventListener("input", event => {
     if (event.target.matches("[data-course-field]")) updateCourseField(event.target);
+    if (event.target.matches("[data-professional-field]")) updateProfessionalField(event.target);
     if (event.target.id === "courseSearch") {
       state.catalogueQuery = event.target.value;
       saveState();
@@ -1058,6 +1328,15 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   });
 
   document.addEventListener("change", event => {
+    if (event.target.matches("[data-professional-field]")) updateProfessionalField(event.target);
+    if (event.target.matches("[data-professional-task]")) {
+      const p = professionalProgressFor(state.currentProfessional);
+      p.tasks[event.target.dataset.professionalTask] = event.target.checked;
+      p.lastVisited = new Date().toISOString();
+      saveState("Working step saved.");
+      render();
+      return;
+    }
     if (event.target.id === "facultyFilter") {
       state.catalogueFaculty = event.target.value;
       saveState();
@@ -1093,12 +1372,12 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   });
 
   function exportBackup() {
-    const payload = { app: "Holiday University", exportedAt: new Date().toISOString(), dataVersion: DATA.version, state };
+    const payload = { app: "Lantern Academy", exportedAt: new Date().toISOString(), dataVersion: "2.0", state };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `Holiday-University-Backup-${new Date().toISOString().slice(0, 10)}.json`;
+    anchor.download = `Lantern-Academy-Backup-${new Date().toISOString().slice(0, 10)}.json`;
     anchor.click();
     URL.revokeObjectURL(url);
     showToast("Backup exported.");
@@ -1109,8 +1388,8 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     if (!file) return;
     try {
       const payload = JSON.parse(await file.text());
-      if (payload.app !== "Holiday University" || !payload.state) throw new Error("Not a Holiday University backup");
-      state = { ...defaults, ...payload.state, currentView: "dashboard" };
+      if (!["Lantern Academy","Holiday University"].includes(payload.app) || !payload.state) throw new Error("Not a Lantern Academy backup");
+      state = { ...freshDefaults(), ...payload.state, currentView: "dashboard" };
       saveState("University backup restored.");
       render();
     } catch (error) {
@@ -1123,7 +1402,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   function resetState() {
     if (!confirm("Erase every local answer, note, question and course record on this device?")) return;
     if (!confirm("This cannot be undone unless you exported a backup. Erase it now?")) return;
-    state = { ...defaults, matriculatedAt: new Date().toISOString() };
+    state = freshDefaults();
     saveState("Local study record erased.");
     render();
   }
