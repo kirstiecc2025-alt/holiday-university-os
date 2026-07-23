@@ -139,6 +139,15 @@ h3 { margin: 0 0 8px; font-size: 24px; }
 .professional-layout { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 20px; align-items: start; }
 .lesson-block { margin: 0 0 18px; padding: 20px; border-left: 3px solid #607d74; background: rgba(240,235,225,.7); }
 .lesson-block p:last-child { margin-bottom: 0; }
+.lesson-detail { margin-top: 14px; padding-top: 13px; border-top: 1px solid #d8cbbb; }
+.lesson-detail strong { color: #405b54; }
+.professional-resources { display: grid; gap: 10px; margin: 14px 0 24px; }
+.question-wrap { margin-top: 16px; padding: 16px; border: 1px solid #d7c8b3; border-radius: 10px; background: rgba(255,255,255,.5); }
+.question-wrap > p { margin: 0 0 10px; }
+.breakdown { margin-top: 10px; padding: 14px; border-left: 3px solid #a98a4e; background: #f8f1e5; }
+.breakdown p { margin: 6px 0; }
+.breakdown-button { min-height: 38px; padding: 7px 11px; color: #405b54; border: 1px solid #8fa49c; border-radius: 7px; background: #f8fbf9; cursor: pointer; }
+.ink-straightening { color: #476058; font-weight: 700; }
 .work-output { border-color: #a88a4e; background: #fffaf0; }
 .professional-side { position: sticky; top: 22px; display: grid; gap: 12px; }
 .task-checks { display: grid; gap: 8px; margin: 14px 0; }
@@ -313,6 +322,24 @@ body.focus-mode .focus-exit { display: block; }
   .reading-panel { padding: 18px; }
 }
 
+.librarian-shell { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:20px; align-items:start; }
+.librarian-chat { min-height:480px; display:flex; flex-direction:column; }
+.librarian-messages { display:flex; flex-direction:column; gap:14px; flex:1; max-height:58vh; overflow:auto; padding:4px 4px 18px; }
+.librarian-message { max-width:88%; padding:15px 17px; border-radius:18px; line-height:1.6; white-space:pre-wrap; }
+.librarian-message.user { align-self:flex-end; color:#fff; background:#4d607b; border-bottom-right-radius:5px; }
+.librarian-message.assistant { align-self:flex-start; background:#f1eadc; border:1px solid rgba(114,89,54,.18); border-bottom-left-radius:5px; }
+.librarian-message .message-actions { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
+.librarian-message .message-actions button { font:inherit; font-size:12px; border:1px solid rgba(60,46,31,.2); background:rgba(255,255,255,.6); border-radius:999px; padding:5px 9px; }
+.librarian-composer { border-top:1px solid rgba(60,46,31,.12); padding-top:14px; }
+.librarian-composer textarea { min-height:96px; }
+.librarian-prompts { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 14px; }
+.librarian-prompts button { border:1px solid rgba(120,91,46,.25); background:#fbf7ee; color:inherit; border-radius:999px; padding:8px 11px; font:inherit; font-size:13px; }
+.librarian-status { display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:13px; color:var(--muted); }
+.librarian-status span:first-child { color:#a87934; }
+.librarian-status.ready span:first-child { color:#42644f; }
+.librarian-thinking { opacity:.7; font-style:italic; }
+@media (max-width: 900px) { .librarian-shell { grid-template-columns:1fr; } .librarian-side { order:-1; } }
+
 @media print {
   .sidebar, .mobile-header, .mobile-nav, .button-row, .tabs, .side-card, .back-link, .ink-toolbar, .full-page-ink { display: none !important; }
   main { margin: 0; padding: 20px; background: #fff; }
@@ -340,6 +367,7 @@ body.focus-mode .focus-exit { display: block; }
         <button data-view="faculties"><span>⌘</span> Faculty Hall</button>
         <button data-view="catalogue"><span>☰</span> Course Registry</button>
         <button data-view="search"><span>⌕</span> Search Academy</button>
+        <button data-view="librarian"><span>✦</span> The Librarian</button>
         <button data-view="cabinet"><span>?</span> Curiosity Cabinet</button>
         <button data-view="commonplace"><span>✎</span> Commonplace Book</button>
         <button data-view="transcript"><span>◇</span> Academic Passport</button>
@@ -368,6 +396,7 @@ body.focus-mode .focus-exit { display: block; }
     <button data-view="faculties">Faculties</button>
     <button data-view="catalogue">Courses</button>
     <button data-view="search">Search Academy</button>
+    <button data-view="librarian">The Librarian</button>
     <button data-view="cabinet">Cabinet</button>
     <button data-view="commonplace">Commonplace</button>
     <button data-view="transcript">Passport</button>
@@ -507,6 +536,33 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       {title:"Make the path visible",text:"Use descriptive headings, short steps, meaningful examples and consistent terms. Explain choices and recovery, not only the perfect sequence. Keep screenshots purposeful because interfaces change. Build accessibility into structure, contrast, text size, link labels, reading order and alternatives."},
       {title:"Test comprehension, not admiration",text:"Ask someone to use the resource without coaching. Observe where they pause, misinterpret or search. Ask them to explain what they would do next. Revise the resource, then record owner, version, source links and a review date so it does not become confidently obsolete."}],tasks:["Define user, moment and single job","Create the shortest complete route","Add accessibility and recovery guidance","Test without rescuing and revise"],outputPrompt:"Create a reusable resource specification and first draft, including audience, purpose, structure, accessibility, test notes, owner, version and review date.",evidencePrompt:"Where did the user’s behaviour contradict your assumption about clarity?",workUse:"Publish or use the revised resource once, then schedule its first content review."}
   ];
+  const PROFESSIONAL_EXTRAS = {
+    p1:{example:"Example: use AI to turn your own session notes into a first draft, then check every claim, rewrite the tone and make the final decision yourself.",practice:"Choose a low-risk task you already understand. Save the original, the prompt, the AI draft and your final version so you can compare them.",resources:[["OpenAI Academy — prompting","https://academy.openai.com/"],["ICO — guidance on AI and data protection","https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/"]]},
+    p2:{example:"Example: someone struggling to upload a CV may be facing confusing file locations, low confidence and an inaccessible form—not simply a lack of skill.",practice:"Watch one person attempt a real digital task. Note the exact pause points before offering help, then redesign one step.",resources:[["SCVO — Digital Inclusion","https://digital.scvo.scot/"],["GOV.UK — Service Manual accessibility","https://www.gov.uk/service-manual/helping-people-to-use-your-service"]]},
+    p3:{example:"Example: instead of ‘learn Canva’, use ‘create, download and find a one-page invoice independently’. The outcome tells you what to teach and what to leave out.",practice:"Take an existing session and remove anything that does not directly help the learner complete the final action.",resources:[["Education Endowment Foundation — teaching and learning toolkit","https://educationendowmentfoundation.org.uk/education-evidence/teaching-learning-toolkit"],["CAST — Universal Design for Learning","https://udlguidelines.cast.org/"]]},
+    p4:{example:"Example: two participants can share the goal of work but need different routes—one needs confidence and digital access; another needs recent evidence and employer contact.",practice:"Create three participant stories with different barriers, strengths and destinations. Test whether your programme offers each a believable next step.",resources:[["Skills Development Scotland — labour market information","https://www.skillsdevelopmentscotland.co.uk/what-we-do/scotlands-careers-services/labour-market-information"],["Scottish Government — No One Left Behind","https://www.gov.scot/policies/employment-support/no-one-left-behind/"]]},
+    p5:{example:"Example: an invoice delay may look like staff forgetfulness but actually come from duplicate spreadsheets, unclear approval and no visible status.",practice:"Map one real case from beginning to end, including waiting and exceptions—not the polished process people say should happen.",resources:[["GOV.UK Service Manual — measuring performance","https://www.gov.uk/service-manual/measuring-success"],["NHS England — process mapping guide","https://www.england.nhs.uk/improvement-hub/publication/process-mapping-a-conventional-model/"]]},
+    p6:{example:"Example: automatically format and route a submitted form, but send incomplete or high-risk cases to a named person instead of guessing.",practice:"Write the trigger, inputs, rule, output, exception and recovery route before choosing any automation tool.",resources:[["ICO — accountability framework","https://ico.org.uk/for-organisations/accountability-framework/"],["Microsoft — automation best practices","https://learn.microsoft.com/en-us/power-automate/guidance/planning/best-practices"]]},
+    p7:{example:"Example: ‘24 people attended’ is activity. ‘18 can now complete the task without support’ is an outcome. Both matter, but they answer different questions.",practice:"Take one current metric and write the decision it helps someone make. If there is no decision, reconsider collecting it.",resources:[["BetterEvaluation — evaluation methods","https://www.betterevaluation.org/methods-approaches"],["NCVO — impact and evaluation","https://www.ncvo.org.uk/help-and-guidance/strategy-and-impact/impact-evaluation/"]]},
+    p8:{example:"Example: a sign-in sheet needs a clear purpose, limited access, a retention period and a safe deletion route—not permanent residence in a mystery folder.",practice:"Follow one piece of personal information from collection to deletion and list every copy, person and system it touches.",resources:[["ICO — data protection principles","https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/data-protection-principles/"],["SCVO — information and data protection","https://scvo.scot/support/running-your-organisation/legislation-regulation/data-protection"]]},
+    p9:{example:"Example: when one voice dominates, restate the purpose, invite written or paired input and use a clear boundary without humiliating the person.",practice:"Write the exact words you could use for confusion, conflict, disclosure, domination and running out of time.",resources:[["Seeds for Change — facilitation tools","https://www.seedsforchange.org.uk/resources"],["NSPCC Learning — safeguarding procedures","https://learning.nspcc.org.uk/safeguarding-child-protection"]]},
+    p10:{example:"Example: ‘buy a CRM’ is not a strategy. ‘Reduce lost referrals and make case ownership visible’ is an outcome that may—or may not—require a CRM.",practice:"For each proposed tool, name the problem, owner, ongoing work, measure and exit plan.",resources:[["SCVO — digital evolution","https://digital.scvo.scot/"],["NCVO — strategy and planning","https://www.ncvo.org.uk/help-and-guidance/strategy-and-impact/"]]},
+    p11:{example:"Example: a client asking for automation may actually have inconsistent inputs and unclear ownership. Discovery keeps you from automating the chaos at impressive speed.",practice:"Interview using ‘tell me about the last time’, then separate what you observed from what you inferred.",resources:[["UK Government — Service Manual discovery","https://www.gov.uk/service-manual/agile-delivery/how-the-discovery-phase-works"],["Design Council — Double Diamond","https://www.designcouncil.org.uk/our-resources/the-double-diamond/"]]},
+    p12:{example:"Example: a step-by-step guide should show how to recover when the wrong file is chosen, because real users occasionally decline to follow the perfect demo script.",practice:"Give the resource to someone without explanation. Watch quietly, record every pause and revise before asking whether they liked it.",resources:[["GOV.UK — writing for GOV.UK","https://www.gov.uk/guidance/content-design/writing-for-gov-uk"],["W3C — easy checks for accessibility","https://www.w3.org/WAI/test-evaluate/preliminary/"]]}
+  };
+
+  function questionBreakdown(kind, module, text) {
+    const firstTask = module.tasks?.[0] || "choose one small starting action";
+    if (kind === "output") return {means:"Make one practical item you could genuinely use, rather than writing an essay about the topic.",steps:`Start with “${firstTask}”. Then use the pathway principles to draft the item, check it and improve it once.`,enough:"A rough but usable first version is enough. It does not need to be polished or complete."};
+    if (kind === "evidence") return {means:"Look back at what you tried and identify the specific difference the learning made.",steps:"Compare before and after. Name one decision, assumption, action or result that changed, and the evidence that lets you say so.",enough:"Two or three honest sentences plus one concrete example counts."};
+    return {means:`Put this into your own words: ${text}`,steps:"Think of one real situation from The Gate, ECC or another project. Describe what happened, what you noticed and what you would do next.",enough:"One clear example or a short bullet list is enough."};
+  }
+
+  function renderBreakdown(kind, module, text) {
+    const detail = questionBreakdown(kind, module, text);
+    const id = `breakdown-${module.id}-${kind}`;
+    return `<button type="button" class="breakdown-button" data-breakdown="${id}" aria-expanded="false">Break this down</button><div class="breakdown" id="${id}" hidden><p><strong>In plain English:</strong> ${escapeHtml(detail.means)}</p><p><strong>Try it like this:</strong> ${escapeHtml(detail.steps)}</p><p><strong>What counts as enough:</strong> ${escapeHtml(detail.enough)}</p></div>`;
+  }
   const STORAGE_KEY = "holiday-university-os-state-v1";
   const RECOVERY_KEY = "lantern-academy-recovery-v2";
   const milestoneNames = {
@@ -537,7 +593,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   let driveSyncBusy = false;
 
   const defaults = {
-    version: 3,
+    version: 3.2,
     studyMode: "curiosity",
     currentView: "dashboard",
     currentCourse: null,
@@ -553,6 +609,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     bookmarks: {},
     stickyNotes: {},
     searchQuery: "",
+    librarian: { endpoint: "", includeNotes: true, messages: [], lastAction: "discuss" },
     blendedConnection: "",
     backupMeta: { lastExport: null, lastSaved: null },
     syncMeta: { enabled: false, lastSync: null, remoteUpdatedAt: null },
@@ -565,13 +622,13 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   let state = loadState();
 
   function freshDefaults() {
-    return { ...defaults, progress: {}, professionalProgress: {}, customProjects: [], bookmarks: {}, stickyNotes: {}, cabinet: [], commonplace: [], recent: [], backupMeta: { lastExport: null, lastSaved: null }, syncMeta: { enabled: false, lastSync: null, remoteUpdatedAt: null }, matriculatedAt: new Date().toISOString() };
+    return { ...defaults, progress: {}, professionalProgress: {}, customProjects: [], bookmarks: {}, stickyNotes: {}, cabinet: [], commonplace: [], recent: [], librarian: { ...defaults.librarian, messages: [] }, backupMeta: { lastExport: null, lastSaved: null }, syncMeta: { enabled: false, lastSync: null, remoteUpdatedAt: null }, matriculatedAt: new Date().toISOString() };
   }
 
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      return saved ? { ...freshDefaults(), ...saved, version: defaults.version, backupMeta: { ...freshDefaults().backupMeta, ...(saved.backupMeta || {}) }, syncMeta: { ...freshDefaults().syncMeta, ...(saved.syncMeta || {}) } } : freshDefaults();
+      return saved ? { ...freshDefaults(), ...saved, version: defaults.version, librarian: { ...freshDefaults().librarian, ...(saved.librarian || {}), messages: saved.librarian?.messages || [] }, backupMeta: { ...freshDefaults().backupMeta, ...(saved.backupMeta || {}) }, syncMeta: { ...freshDefaults().syncMeta, ...(saved.syncMeta || {}) } } : freshDefaults();
     } catch (_) {
       return freshDefaults();
     }
@@ -823,7 +880,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   const inkSettings = {};
 
   function inkState(surface, overlay = false) {
-    return inkSettings[surface] || (inkSettings[surface] = { tool: "pen", colour: inkColours[0], enabled: !overlay, visible: true });
+    return inkSettings[surface] || (inkSettings[surface] = { tool: "pen", colour: inkColours[0], enabled: !overlay, visible: true, smoothing: true });
   }
 
   function renderInkToolbar(surface, overlay = false) {
@@ -833,10 +890,11 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       ${surface.includes("fullpage") ? `<button type="button" data-add-sticky="${escapeHtml(surface)}">＋ Sticky note</button>` : ""}
       <button type="button" data-ink-tool="pen" class="${setting.tool === "pen" ? "active" : ""}">Pen</button>
       <button type="button" data-ink-tool="highlighter" class="${setting.tool === "highlighter" ? "active" : ""}">Highlighter</button>
+      <button type="button" data-ink-action="smoothing" class="${setting.smoothing !== false ? "active" : ""}">Neaten ink</button>
       <button type="button" data-ink-tool="eraser" class="${setting.tool === "eraser" ? "active" : ""}">Eraser</button>
       ${inkColours.map(colour => `<button type="button" class="ink-colour ${setting.colour === colour ? "active" : ""}" style="--swatch:${colour}" data-ink-colour="${colour}" aria-label="Choose ink colour"></button>`).join("")}
       <button type="button" data-ink-action="undo">Undo</button><button type="button" data-ink-action="visibility">${setting.visible ? "Hide ink" : "Show ink"}</button><button type="button" data-ink-action="clear">Clear</button>
-      <p class="ink-help">Apple Pencil or mouse draws. A finger still scrolls the page.</p>
+      <p class="ink-help">Apple Pencil or mouse draws. A finger still scrolls. Neaten ink smooths wobbles; with Highlighter, draw then hold at the end to snap straight.</p>
     </div>`;
   }
 
@@ -927,6 +985,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     document.querySelectorAll(".primary-nav button").forEach(button => button.classList.toggle("active", button.dataset.view === state.currentView));
     const renderers = {
       dashboard: renderDashboard,
+      librarian: renderLibrarian,
       search: renderSearch,
       faculties: renderFaculties,
       catalogue: renderCatalogue,
@@ -958,6 +1017,68 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     const day = Math.floor(Date.now() / 86400000);
     const offset = routeOrder.indexOf(state.selectedCapacity) * 7;
     return DATA.courses[(day + offset) % DATA.courses.length];
+  }
+
+  function librarianContext() {
+    const context = { mode: state.studyMode, capacity: state.selectedCapacity };
+    if (state.currentCourse && courseById[state.currentCourse]) {
+      const course = courseById[state.currentCourse], progress = progressFor(course.id);
+      context.course = { code: course.code, title: course.title, faculty: course.faculty, question: course.question, lecture: course.lecture.slice(0, 9000), resources: course.resources };
+      if (state.librarian.includeNotes) context.notes = { doorAnswer: progress.doorAnswer, thoughtBefore: progress.thoughtBefore, surprise: progress.surprise, notes: progress.notes, passport: progress.passport };
+    }
+    if (state.currentProfessional) {
+      const module = PROFESSIONAL_MODULES.find(item => item.id === state.currentProfessional), progress = professionalProgressFor(state.currentProfessional);
+      if (module) context.pathway = { title: module.title, goal: module.goal, lessons: module.lessons, tasks: module.tasks, outputPrompt: module.outputPrompt, workUse: module.workUse };
+      if (state.librarian.includeNotes) context.professionalNotes = { evidence: progress.evidence, notes: progress.notes, output: progress.output };
+    }
+    context.recentDiscoveries = state.librarian.includeNotes ? (state.commonplace || []).slice(0, 5).map(entry => entry.text) : [];
+    return context;
+  }
+
+  function renderLibrarian() {
+    const librarian = state.librarian || freshDefaults().librarian;
+    const ready = /^https:\/\//.test(librarian.endpoint || "");
+    const messages = librarian.messages || [];
+    const context = librarianContext();
+    const contextLabel = context.course ? `${context.course.code} ${context.course.title}` : context.pathway ? context.pathway.title : "Academy-wide conversation";
+    return `${pageHeader("The Living Academy", "The Librarian", "Ask, untangle, connect and turn learning into something usable.")}
+      <div class="librarian-shell">
+        <section class="card librarian-chat">
+          <div class="librarian-status ${ready ? "ready" : ""}"><span>●</span><span>${ready ? "The reading-room door is open" : "The secure AI doorway still needs its address"}</span></div>
+          <div class="librarian-messages" id="librarianMessages">
+            ${messages.length ? messages.map((message, index) => `<div class="librarian-message ${message.role}">${escapeHtml(message.text)}${message.role === "assistant" ? `<div class="message-actions"><button data-librarian-save="${index}">Keep in Commonplace Book</button><button data-librarian-pathway="${index}">Turn into a pathway</button></div>` : ""}</div>`).join("") : `<div class="empty"><strong>The Librarian is at the desk.</strong><br>Ask about the course you are reading, request a simpler explanation, follow a connection, or build a new study path.</div>`}
+          </div>
+          <form class="librarian-composer" id="librarianForm">
+            <div class="librarian-prompts"><button type="button" data-librarian-prompt="Explain this simply, using an everyday example.">Explain simply</button><button type="button" data-librarian-prompt="Ask me three thoughtful questions that will help me think more deeply about this.">Question me</button><button type="button" data-librarian-prompt="Show me the most interesting connection between this and something else in the Academy.">Find a connection</button><button type="button" data-librarian-prompt="Build me a gentle learning pathway for this topic, with a low-energy starting point, core lessons, activities and one glorious rabbit hole.">Build a pathway</button></div>
+            <div class="field"><label for="librarianQuestion">What shall we investigate?</label><textarea id="librarianQuestion" placeholder="Type, dictate, or use Apple Pencil Scribble…" required></textarea></div>
+            <div class="button-row" style="margin-top:12px"><button class="btn btn-primary" type="submit" ${ready ? "" : "disabled"}>Ask the Librarian</button>${messages.length ? '<button class="btn" type="button" data-librarian-clear>Clear conversation</button>' : ""}</div>
+          </form>
+        </section>
+        <aside class="librarian-side">
+          <section class="card"><p class="eyebrow">Current desk</p><h3>${escapeHtml(contextLabel)}</h3><p class="muted">The Librarian uses the room you last opened as context. You remain in control of whether your written notes are included.</p><label class="check-item"><input type="checkbox" data-librarian-notes ${librarian.includeNotes ? "checked" : ""}><span>Include my typed notes and recent discoveries</span></label></section>
+          <section class="card" style="margin-top:16px"><p class="eyebrow">Privacy</p><p class="muted small">Only your question, recent chat and the selected context are sent through your private worker. Pencil drawings and your full Drive record are never sent.</p>${!ready ? '<button class="btn" data-view="settings">Set up secure doorway</button>' : ""}</section>
+        </aside>
+      </div>`;
+  }
+
+  async function askLibrarian(question) {
+    const librarian = state.librarian;
+    const history = (librarian.messages || []).slice(-10);
+    librarian.messages.push({ role: "user", text: question, at: new Date().toISOString() });
+    render();
+    const messages = document.getElementById("librarianMessages");
+    if (messages) { messages.insertAdjacentHTML("beforeend", '<div class="librarian-message assistant librarian-thinking">The Librarian is consulting the shelves…</div>'); messages.scrollTop = messages.scrollHeight; }
+    try {
+      const response = await fetch(librarian.endpoint.replace(/\/$/, "") + "/librarian", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question, history, context: librarianContext(), action: librarian.lastAction || "discuss" }) });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || `The Librarian returned ${response.status}`);
+      librarian.messages.push({ role: "assistant", text: payload.answer || "The shelves were unusually silent.", at: new Date().toISOString() });
+      saveState(); render();
+      requestAnimationFrame(() => { const box = document.getElementById("librarianMessages"); if (box) box.scrollTop = box.scrollHeight; });
+    } catch (error) {
+      librarian.messages.push({ role: "assistant", text: `I could not reach the reading room. ${error.message}`, at: new Date().toISOString(), error: true });
+      saveState(); render();
+    }
   }
 
   function renderDashboard() {
@@ -1122,6 +1243,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
 
   function renderProfessionalCourse() {
     const module = PROFESSIONAL_MODULES.find(item => item.id === state.currentProfessional) || PROFESSIONAL_MODULES[0];
+    const extras = PROFESSIONAL_EXTRAS[module.id];
     state.currentProfessional = module.id;
     const p = professionalProgressFor(module.id);
     p.lastVisited = new Date().toISOString();
@@ -1134,14 +1256,14 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       <div class="professional-layout">
         <article class="reading-panel">
           ${renderInkToolbar(`professional:${module.id}:reading`, true)}
-          <div class="annotation-stage ${inkState(`professional:${module.id}:reading`, true).enabled ? "ink-enabled" : ""} ${inkState(`professional:${module.id}:reading`, true).visible ? "" : "ink-hidden"}" data-ink-container="professional:${module.id}:reading"><div class="annotation-content"><p class="eyebrow">Core reading</p><h2>Learn the working principles</h2>${module.lessons.map((lesson,index) => `<section class="lesson-block"><p class="eyebrow">Principle ${index + 1}</p><h3>${escapeHtml(lesson.title)}</h3><p>${escapeHtml(lesson.text)}</p></section>`).join("")}</div><canvas class="ink-canvas annotation-canvas" data-ink-surface="professional:${module.id}:reading" aria-label="Professional reading annotation layer"></canvas></div>
-          <section class="card work-output"><p class="eyebrow">Apply it</p><h2>Build the real output</h2><p>${escapeHtml(module.outputPrompt)}</p><div class="field"><label for="professionalOutput">Your working output</label><textarea id="professionalOutput" data-professional-field="output" placeholder="Type here, dictate, or use Apple Pencil Scribble…">${escapeHtml(p.output)}</textarea></div></section>
-          <section class="card" style="margin-top:18px"><p class="eyebrow">CPD evidence</p><h2>Record what changed</h2><p>${escapeHtml(module.evidencePrompt)}</p><div class="field"><label for="professionalEvidence">Evidence and reflection</label><textarea id="professionalEvidence" data-professional-field="evidence">${escapeHtml(p.evidence)}</textarea></div><div class="field" style="margin-top:14px"><label for="professionalNotes">Notes, examples and connections</label><textarea id="professionalNotes" data-professional-field="notes">${escapeHtml(p.notes)}</textarea></div>${renderProfessionalInkPad(module.id)}</section>
+          <div class="annotation-stage ${inkState(`professional:${module.id}:reading`, true).enabled ? "ink-enabled" : ""} ${inkState(`professional:${module.id}:reading`, true).visible ? "" : "ink-hidden"}" data-ink-container="professional:${module.id}:reading"><div class="annotation-content"><p class="eyebrow">Core reading</p><h2>Learn the working principles</h2><p class="lede">${escapeHtml(module.summary)}</p>${module.lessons.map((lesson,index) => `<section class="lesson-block"><p class="eyebrow">Lesson ${index + 1} of ${module.lessons.length}</p><h3>${escapeHtml(lesson.title)}</h3><p>${escapeHtml(lesson.text)}</p>${index === 0 ? `<div class="lesson-detail"><p><strong>A real example</strong></p><p>${escapeHtml(extras.example)}</p></div>` : ""}${index === 1 ? `<div class="lesson-detail"><p><strong>Try this while you learn</strong></p><p>${escapeHtml(extras.practice)}</p></div>` : ""}${index === 2 ? `<div class="lesson-detail"><p><strong>Pause and check</strong></p><p>Can you explain this principle using one real situation, and name what you would do differently because of it?</p>${renderBreakdown(`lesson-${index}`, module, lesson.title)}</div>` : ""}</section>`).join("")}<section><p class="eyebrow">Further learning</p><h2>Useful, trustworthy resources</h2><p>Choose one resource that fills a gap; opening every tab is not a personality requirement.</p><div class="professional-resources">${extras.resources.map(resource => `<a class="resource" href="${escapeHtml(resource[1])}" target="_blank" rel="noopener noreferrer"><span class="resource-type">Read</span><strong>${escapeHtml(resource[0])}</strong><span aria-hidden="true">↗</span></a>`).join("")}</div></section></div><canvas class="ink-canvas annotation-canvas" data-ink-surface="professional:${module.id}:reading" aria-label="Professional reading annotation layer"></canvas></div>
+          <section class="card work-output"><p class="eyebrow">Apply it</p><h2>Build the real output</h2><div class="question-wrap"><p>${escapeHtml(module.outputPrompt)}</p>${renderBreakdown("output", module, module.outputPrompt)}</div><div class="field"><label for="professionalOutput">Your working output</label><textarea id="professionalOutput" data-professional-field="output" placeholder="Type here, dictate, or use Apple Pencil Scribble…">${escapeHtml(p.output)}</textarea></div></section>
+          <section class="card" style="margin-top:18px"><p class="eyebrow">CPD evidence</p><h2>Record what changed</h2><div class="question-wrap"><p>${escapeHtml(module.evidencePrompt)}</p>${renderBreakdown("evidence", module, module.evidencePrompt)}</div><div class="field"><label for="professionalEvidence">Evidence and reflection</label><textarea id="professionalEvidence" data-professional-field="evidence">${escapeHtml(p.evidence)}</textarea></div><div class="field" style="margin-top:14px"><label for="professionalNotes">Notes, examples and connections</label><textarea id="professionalNotes" data-professional-field="notes">${escapeHtml(p.notes)}</textarea></div>${renderProfessionalInkPad(module.id)}</section>
         </article>
         <aside class="professional-side">
           <section class="card"><p class="eyebrow">Pathway progress</p><h3>${percent}% complete</h3><div class="course-progress-track"><span style="width:${percent}%;background:#476058"></span></div></section>
           <section class="card"><p class="eyebrow">Plan the work</p><div class="field"><label for="professionalPriority">Priority</label><select id="professionalPriority" data-professional-field="priority"><option value="low" ${p.priority === "low" ? "selected" : ""}>Low</option><option value="medium" ${p.priority === "medium" ? "selected" : ""}>Medium</option><option value="high" ${p.priority === "high" ? "selected" : ""}>High</option></select></div><div class="field" style="margin-top:12px"><label for="professionalDeadline">Useful by</label><input id="professionalDeadline" type="date" data-professional-field="deadline" value="${escapeHtml(p.deadline)}"></div></section>
-          <section class="card"><p class="eyebrow">Working steps</p><div class="task-checks">${module.tasks.map((task,index) => `<label><input type="checkbox" data-professional-task="${index}" ${p.tasks[index] ? "checked" : ""}><span>${escapeHtml(task)}</span></label>`).join("")}</div></section>
+          <section class="card"><p class="eyebrow">Working steps</p><p class="muted">Do these in order. Each is one manageable piece of the final output.</p><div class="task-checks">${module.tasks.map((task,index) => `<label><input type="checkbox" data-professional-task="${index}" ${p.tasks[index] ? "checked" : ""}><span>${escapeHtml(task)}</span></label>`).join("")}</div>${renderBreakdown("steps", module, module.tasks.join("; "))}</section>
           <section class="card"><p class="eyebrow">Use it at work</p><p>${escapeHtml(module.workUse)}</p></section>
           <div class="button-row">${bookmarkButton("professional", module.id)}<button class="btn" data-print-page>Export page / PDF</button></div>
           <button class="btn ${p.completed ? "" : "btn-primary"}" data-professional-complete="${module.id}">${p.completed ? "✓ Pathway completed — reopen" : "Complete pathway"}</button>
@@ -1357,12 +1479,13 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       ${pageHeader("System Office", "Settings, sync & backup", "Your work remains available offline on this device and can now travel safely through Google Drive.")}
       <section class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
         <div class="card"><p class="eyebrow">Google Drive sync</p><h3>Your Academy on every device</h3><p class="muted">Lantern Academy can access only the folder and records it creates. It cannot browse the rest of your Drive.</p><div class="storage-status"><span>●</span><span>${escapeHtml(driveStatus)} · ${escapeHtml(lastSync)}</span></div><div class="button-row" style="margin-top:14px">${driveToken ? '<button class="btn btn-primary" data-drive-sync>Sync now</button><button class="btn" data-drive-disconnect>Disconnect</button>' : '<button class="btn btn-primary" data-drive-connect>Connect Google Drive</button>'}</div><p class="muted small" style="margin-top:12px">After reopening the app, tap reconnect once. Automatic syncing continues while the Academy is open.</p></div>
+        <div class="card"><p class="eyebrow">AI Librarian</p><h3>Secure reading-room doorway</h3><p class="muted">Paste the public URL of your Lantern Librarian Cloudflare Worker. Never paste an API key here.</p><div class="field"><label for="librarianEndpoint">Worker address</label><input id="librarianEndpoint" type="url" data-librarian-endpoint value="${escapeHtml(state.librarian?.endpoint || "")}" placeholder="https://lantern-librarian.your-name.workers.dev"></div><div class="button-row" style="margin-top:12px"><button class="btn btn-primary" data-librarian-test>Test doorway</button><button class="btn" data-view="librarian">Open Librarian</button></div></div>
         <div class="card"><p class="eyebrow">Install</p><h3>Make it feel like an app</h3><p class="muted">Install Lantern Academy from your browser for a full-screen icon and offline access.</p><button id="installButton" class="btn btn-primary" ${deferredInstallPrompt ? "" : "disabled"}>${deferredInstallPrompt ? "Install Lantern Academy" : "Use your browser's Add to Home Screen"}</button></div>
         <div class="card"><p class="eyebrow">Protected backup</p><h3>Carry your Academy safely</h3><p class="muted">Current private study record: approximately ${savedKb} KB. Exports include an integrity check before they can replace your work.</p><div class="button-row"><button class="btn btn-primary" data-export>Export verified backup</button><button class="btn" data-import>Import backup</button></div><div class="storage-status"><span>●</span><span>${escapeHtml(lastExport)}</span></div></div>
         <div class="card"><p class="eyebrow">Offline</p><h3>Downloaded campus</h3><p class="muted">The 48 course lectures and app interface are included. External video, audio and article links still require internet.</p><button class="btn" data-refresh-cache>Refresh offline copy</button></div>
         <div class="card"><p class="eyebrow">Private records</p><h3>Begin again</h3><p class="muted">This permanently removes local notes, answers and progress from this device. Export first if uncertain.</p><button class="btn" data-reset>Erase local study record</button></div>
       </section>
-      <section class="card" style="margin-top:20px"><h2>What is inside this edition</h2><p>Three study modes · six curiosity faculties · 48 complete course portals · 12 Academy pathways · custom professional pathways · universal search and bookmarks · integrated reading, tasks, work outputs, full-page Pencil notes, sticky notes, Curiosity Cabinet, Commonplace Book, Academy record, offline caching, verified backup and restore · Google Drive cross-device sync with daily recovery copies.</p><p class="muted small">Lantern Academy release 3.0 · The Living Academy. Local-first by design: losing a connection never locks you out of your work.</p></section>
+      <section class="card" style="margin-top:20px"><h2>What is inside this edition</h2><p>Three study modes · six curiosity faculties · 48 complete course portals · 12 expanded Academy pathways · the AI Librarian · custom professional pathways · universal search and bookmarks · integrated reading, plain-language question breakdowns, trusted resources, tasks, work outputs, neatened full-page Pencil notes, straight-line highlighting, sticky notes, Curiosity Cabinet, Commonplace Book, Academy record, offline caching, verified backup and restore · Google Drive cross-device sync with daily recovery copies.</p><p class="muted small">Lantern Academy release 3.2 · The Clearer Path. Local-first by design: losing a connection never locks you out of your work.</p></section>
     </div>`;
   }
 
@@ -1446,10 +1569,27 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       ctx.lineWidth = stroke.tool === "highlighter" ? 18 : stroke.tool === "eraser" ? 24 : 2.8;
       ctx.lineCap = "round"; ctx.lineJoin = "round";
       ctx.beginPath();
-      stroke.points.forEach((point, index) => {
-        const x = point.x * rect.width, y = point.y * rect.height;
-        if (!index) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      });
+      if (stroke.straight && stroke.points.length > 1) {
+        const first = stroke.points[0], last = stroke.points[stroke.points.length - 1];
+        ctx.moveTo(first.x * rect.width, first.y * rect.height);
+        ctx.lineTo(last.x * rect.width, last.y * rect.height);
+      } else if (stroke.smoothing !== false && stroke.points.length > 2) {
+        const first = stroke.points[0];
+        ctx.moveTo(first.x * rect.width, first.y * rect.height);
+        for (let index = 1; index < stroke.points.length - 1; index++) {
+          const current = stroke.points[index], next = stroke.points[index + 1];
+          const midX = (current.x + next.x) / 2 * rect.width;
+          const midY = (current.y + next.y) / 2 * rect.height;
+          ctx.quadraticCurveTo(current.x * rect.width, current.y * rect.height, midX, midY);
+        }
+        const last = stroke.points[stroke.points.length - 1];
+        ctx.lineTo(last.x * rect.width, last.y * rect.height);
+      } else {
+        stroke.points.forEach((point, index) => {
+          const x = point.x * rect.width, y = point.y * rect.height;
+          if (!index) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+      }
       if (stroke.points.length === 1) ctx.lineTo(stroke.points[0].x * rect.width + .1, stroke.points[0].y * rect.height + .1);
       ctx.stroke(); ctx.restore();
     });
@@ -1472,7 +1612,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     document.querySelectorAll("[data-ink-surface]").forEach(canvas => {
       sizeInkCanvas(canvas);
       if (window.ResizeObserver) new ResizeObserver(() => sizeInkCanvas(canvas)).observe(canvas);
-      let stroke = null;
+      let stroke = null, straightTimer = null, lastMoveAt = 0;
       const point = event => {
         const rect = canvas.getBoundingClientRect();
         return { x: Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)), y: Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height)), p: event.pressure || .5 };
@@ -1482,15 +1622,31 @@ if(__exports != exports)module.exports = exports;return module.exports}));
         const setting = inkState(canvas.dataset.inkSurface, canvas.classList.contains("annotation-canvas"));
         if (canvas.classList.contains("annotation-canvas") && !setting.enabled) return;
         event.preventDefault(); canvas.setPointerCapture?.(event.pointerId);
-        stroke = { tool: setting.tool, colour: setting.colour, points: [point(event)] };
+        stroke = { tool: setting.tool, colour: setting.colour, smoothing: setting.smoothing !== false, points: [point(event)] };
         inkRecords(canvas.dataset.inkSurface).push(stroke); drawInk(canvas);
       });
       canvas.addEventListener("pointermove", event => {
         if (!stroke || (event.buttons === 0 && event.pointerType !== "pen")) return;
-        event.preventDefault(); stroke.points.push(point(event)); drawInk(canvas);
+        event.preventDefault();
+        stroke.points.push(point(event));
+        stroke.straight = false;
+        lastMoveAt = Date.now();
+        clearTimeout(straightTimer);
+        if (stroke.tool === "highlighter") {
+          straightTimer = setTimeout(() => {
+            if (stroke && stroke.tool === "highlighter" && Date.now() - lastMoveAt >= 430) {
+              stroke.straight = true;
+              drawInk(canvas);
+              const help = findInkElement("data-ink-toolbar", canvas.dataset.inkSurface)?.querySelector(".ink-help");
+              if (help) { help.textContent = "Straight highlight locked — lift the Pencil to keep it."; help.classList.add("ink-straightening"); }
+            }
+          }, 450);
+        }
+        drawInk(canvas);
       });
       const finish = () => {
         if (!stroke) return;
+        clearTimeout(straightTimer);
         stroke = null;
         const professional = canvas.dataset.inkSurface.startsWith("professional:");
         const custom = canvas.dataset.inkSurface.startsWith("custom:");
@@ -1498,6 +1654,11 @@ if(__exports != exports)module.exports = exports;return module.exports}));
         if (!professional && !custom && canvas.dataset.inkSurface === "answer:doorAnswer") progress.milestones.question = true;
         progress.lastVisited = new Date().toISOString();
         saveState("Handwriting saved.");
+        const help = findInkElement("data-ink-toolbar", canvas.dataset.inkSurface)?.querySelector(".ink-help");
+        if (help) {
+          help.textContent = "Apple Pencil or mouse draws. A finger still scrolls. Neaten ink smooths wobbles; with Highlighter, draw then hold at the end to snap straight.";
+          help.classList.remove("ink-straightening");
+        }
       };
       canvas.addEventListener("pointerup", finish); canvas.addEventListener("pointercancel", finish);
     });
@@ -1507,6 +1668,8 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     const setting = inkState(surface, surface.startsWith("annotation:"));
     toolbar.querySelectorAll("[data-ink-tool]").forEach(button => button.classList.toggle("active", button.dataset.inkTool === setting.tool));
     toolbar.querySelectorAll("[data-ink-colour]").forEach(button => button.classList.toggle("active", button.dataset.inkColour === setting.colour));
+    const smoothing = toolbar.querySelector('[data-ink-action="smoothing"]');
+    if (smoothing) smoothing.classList.toggle("active", setting.smoothing !== false);
     const toggle = toolbar.querySelector('[data-ink-action="toggle"]');
     if (toggle) { toggle.classList.toggle("active", setting.enabled); toggle.textContent = setting.enabled ? "Finish ink" : "Annotate"; }
     const visibility = toolbar.querySelector('[data-ink-action="visibility"]');
@@ -1517,6 +1680,16 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   }
 
   document.addEventListener("click", event => {
+    const breakdownButton = event.target.closest("[data-breakdown]");
+    if (breakdownButton) {
+      const panel = document.getElementById(breakdownButton.dataset.breakdown);
+      if (panel) {
+        panel.hidden = !panel.hidden;
+        breakdownButton.setAttribute("aria-expanded", String(!panel.hidden));
+        breakdownButton.textContent = panel.hidden ? "Break this down" : "Hide breakdown";
+      }
+      return;
+    }
     const addSticky = event.target.closest("[data-add-sticky]");
     if (addSticky) {
       const surface = addSticky.dataset.addSticky;
@@ -1543,6 +1716,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       if (tool) setting.tool = tool.dataset.inkTool;
       if (colour) { setting.colour = colour.dataset.inkColour; setting.tool = "pen"; }
       if (action?.dataset.inkAction === "toggle") setting.enabled = !setting.enabled;
+      if (action?.dataset.inkAction === "smoothing") setting.smoothing = setting.smoothing === false;
       if (action?.dataset.inkAction === "visibility") setting.visible = !setting.visible;
       if (action?.dataset.inkAction === "undo") inkRecords(surface).pop();
       if (action?.dataset.inkAction === "clear" && inkRecords(surface).length && confirm("Clear all handwriting on this area?")) {
@@ -1727,6 +1901,37 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       return;
     }
 
+    const librarianPrompt = event.target.closest("[data-librarian-prompt]");
+    if (librarianPrompt) {
+      const box = document.getElementById("librarianQuestion");
+      if (box) { box.value = librarianPrompt.dataset.librarianPrompt; box.focus(); }
+      return;
+    }
+    const librarianSave = event.target.closest("[data-librarian-save]");
+    if (librarianSave) {
+      const message = state.librarian.messages[Number(librarianSave.dataset.librarianSave)];
+      if (message?.text) { state.commonplace.unshift({ id:uid(), text:message.text, source:"The Librarian", createdAt:new Date().toISOString() }); saveState("Librarian note kept in your Commonplace Book."); }
+      return;
+    }
+    const librarianPathway = event.target.closest("[data-librarian-pathway]");
+    if (librarianPathway) {
+      const message = state.librarian.messages[Number(librarianPathway.dataset.librarianPathway)];
+      if (!message?.text) return;
+      const firstLine = message.text.split("\n").find(line => line.trim()) || "Librarian pathway";
+      const project = { id:uid(), title:firstLine.replace(/^#+\s*/, "").slice(0,90), goal:"Follow and apply this Librarian-designed learning pathway.", priority:"medium", deadline:"", plan:message.text, output:"", evidence:"", notes:"Created from a conversation with the Librarian.", ink:{}, completed:false, createdAt:new Date().toISOString(), lastVisited:new Date().toISOString() };
+      state.customProjects.unshift(project); state.currentCustomProject = project.id; saveState("The Librarian's answer became a pathway."); return setView("customProject");
+    }
+    if (event.target.closest("[data-librarian-clear]")) {
+      if (confirm("Clear this Librarian conversation? Kept Commonplace entries will remain.")) { state.librarian.messages = []; saveState("Reading desk cleared."); render(); }
+      return;
+    }
+    if (event.target.closest("[data-librarian-test]")) {
+      const endpoint = (document.getElementById("librarianEndpoint")?.value || state.librarian.endpoint || "").replace(/\/$/, "");
+      if (!/^https:\/\//.test(endpoint)) return showToast("Enter the secure https Worker address first.");
+      fetch(endpoint + "/health").then(response => { if (!response.ok) throw new Error(); return response.json(); }).then(() => showToast("The Librarian's doorway is open.")).catch(() => showToast("The doorway did not answer yet. Check the Worker address."));
+      return;
+    }
+
     if (event.target.closest("[data-export]")) return exportBackup();
     if (event.target.closest("[data-import]")) return importInput.click();
     if (event.target.closest("[data-drive-connect]")) return connectGoogleDrive();
@@ -1745,6 +1950,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       if (project) { project[event.target.dataset.customField] = event.target.value; project.lastVisited = new Date().toISOString(); saveState(); }
     }
     if (event.target.matches("[data-state-field]")) { state[event.target.dataset.stateField] = event.target.value; saveState(); }
+    if (event.target.matches("[data-librarian-endpoint]")) { state.librarian.endpoint = event.target.value.trim(); saveState(); }
     if (event.target.matches("[data-sticky-text]")) {
       const splitAt = event.target.dataset.stickyText.lastIndexOf(":"), surface = event.target.dataset.stickyText.slice(0, splitAt), id = event.target.dataset.stickyText.slice(splitAt + 1);
       const note = stickyNotesFor(surface).find(item => item.id === id);
@@ -1767,6 +1973,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   });
 
   document.addEventListener("change", event => {
+    if (event.target.matches("[data-librarian-notes]")) { state.librarian.includeNotes = event.target.checked; saveState("Librarian context preference saved."); }
     if (event.target.matches("[data-professional-field]")) updateProfessionalField(event.target);
     if (event.target.matches("[data-custom-field]")) {
       const project = customProjectFor(state.currentCustomProject);
@@ -1794,6 +2001,12 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   });
 
   document.addEventListener("submit", event => {
+    if (event.target.id === "librarianForm") {
+      event.preventDefault();
+      const box = document.getElementById("librarianQuestion"), question = box?.value.trim();
+      if (question) askLibrarian(question);
+      return;
+    }
     if (event.target.id === "customProjectForm") {
       event.preventDefault();
       const project = { id:uid(), title:document.getElementById("projectTitle").value.trim(), goal:document.getElementById("projectGoal").value.trim(), priority:document.getElementById("projectPriority").value, deadline:document.getElementById("projectDeadline").value, plan:"", output:"", evidence:"", notes:"", ink:{}, completed:false, createdAt:new Date().toISOString(), lastVisited:new Date().toISOString() };
