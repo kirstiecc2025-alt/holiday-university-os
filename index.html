@@ -249,7 +249,17 @@ textarea { min-height: 115px; padding: 13px; line-height: 1.55; resize: vertical
 .full-page-ink > p { margin: 0 0 6px; color: #6f5b34; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .full-page-ink .ink-toolbar { margin: 0; border: 0; padding: 0; background: transparent; }
 .full-page-canvas { position: absolute; z-index: 8; inset: 0; width: 100%; height: 100%; border: 0; border-radius: 0; background: transparent; pointer-events: none; touch-action: pan-y; }
-.full-page-annotation.ink-enabled > .full-page-canvas { pointer-events: auto; touch-action: pan-y; }
+.full-page-annotation.ink-enabled > .full-page-canvas { pointer-events: auto; touch-action: none; overscroll-behavior: contain; }
+.learning-pathway { margin:18px 0 24px; padding:22px; border:1px solid #cbbda9; border-radius:14px; background:rgba(255,252,247,.82); }
+.pathway-flow { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:9px; margin:16px 0; }
+.pathway-step { position:relative; min-height:116px; padding:14px 12px; border:1px solid #b9aa92; border-radius:10px; background:#fffaf3; }
+.pathway-step:not(:last-child)::after { content:"→"; position:absolute; right:-11px; top:42%; z-index:2; color:#7a6548; font-weight:800; }
+.pathway-step strong { display:block; margin-bottom:6px; color:#405b54; }
+.worked-example { margin:16px 0; padding:17px; border-left:4px solid #b79449; background:#f7f0df; }
+.lesson-ladder { display:grid; gap:12px; margin:18px 0; }
+.lesson-rung { padding:16px; border:1px solid #d8cbbb; border-radius:10px; background:rgba(255,255,255,.48); }
+.curiosity-bridge { padding:18px; border:1px solid #9cacaa; border-radius:12px; background:linear-gradient(135deg,#edf3f0,#fffaf3); }
+.curiosity-bridge .btn { margin-top:8px; }
 .full-page-annotation.ink-hidden > .full-page-canvas { opacity: 0; }
 
 .entry-list { display: grid; gap: 10px; margin-top: 20px; }
@@ -302,6 +312,8 @@ body.focus-mode .focus-exit { display: block; }
   .dashboard-grid, .passport-summary { grid-template-columns: 1fr; }
   .faculty-grid { grid-template-columns: 1fr; }
   .professional-grid, .blended-grid { grid-template-columns: 1fr; }
+  .pathway-flow { grid-template-columns:1fr; }
+  .pathway-step:not(:last-child)::after { content:"↓"; right:auto; left:50%; top:auto; bottom:-15px; }
   .dashboard-mode-switch { grid-template-columns:1fr; }
   .faculty-card { min-height: 190px; }
   .course-header { padding: 26px 21px; }
@@ -551,6 +563,46 @@ if(__exports != exports)module.exports = exports;return module.exports}));
     p12:{example:"Example: a step-by-step guide should show how to recover when the wrong file is chosen, because real users occasionally decline to follow the perfect demo script.",practice:"Give the resource to someone without explanation. Watch quietly, record every pause and revise before asking whether they liked it.",resources:[["GOV.UK — writing for GOV.UK","https://www.gov.uk/guidance/content-design/writing-for-gov-uk"],["W3C — easy checks for accessibility","https://www.w3.org/WAI/test-evaluate/preliminary/"]]}
   };
 
+  const PROFESSIONAL_FOUNDATIONS = {
+    p1:{plain:"This pathway teaches you how to use AI as a supervised assistant. You remain responsible for the goal, the information supplied, the checks and the final decision.",why:"AI can make drafting, organising and exploring faster, but fluent wording is not proof that an answer is correct. A safe workflow separates what the machine proposes from what a person verifies.",steps:[["1. Define","Name the real task, audience and successful result."],["2. Prepare","Remove private data and gather trustworthy source material."],["3. Prompt","Give context, constraints, format and a clear job."],["4. Inspect","Check facts, omissions, bias, tone and safeguarding risks."],["5. Decide","Rewrite, approve and record the human-owned final result."]],worked:"You need a beginner session plan about online forms. First define the audience and outcome. Give AI your non-confidential notes and ask for a 60-minute structure. Check every instruction against the live form, simplify the language, add accessibility choices and test it yourself. The finished session is yours; the draft was merely scaffolding."},
+    p2:{plain:"Digital inclusion means making sure people can access, understand and confidently use digital services—not merely placing a device in front of them.",why:"A person may be blocked by cost, connectivity, disability, literacy, confidence, trust, language, design or previous bad experiences. Teaching the button presses alone may solve none of those.",steps:[["Notice","Observe the exact point where progress stops."],["Ask","Find out what the person expected and feared."],["Adapt","Change language, device, pace or route."],["Practise","Let the learner complete the action."],["Confirm","Check they can repeat it without rescue."]],worked:"A learner cannot upload a CV. Instead of repeating 'tap upload', discover that the file is in Downloads under an unfamiliar name. Rename it clearly, practise finding it twice and give a short recovery guide."},
+    p3:{plain:"Good teaching begins with what a learner should be able to do afterwards, then works backwards to the smallest sequence that gets them there.",why:"A topic such as 'email' is enormous. A concrete outcome such as 'attach a downloaded file and send it safely' tells you what to demonstrate, practise and check.",steps:[["Outcome","Write one observable end action."],["Starting point","Find what learners already know."],["Model","Show the task slowly and explain choices."],["Practise","Learners repeat it with decreasing help."],["Check","Use a realistic independent task."]],worked:"For an invoice session, the outcome is not 'understand Canva'. It is 'edit a saved invoice template, export it as PDF, find the file and attach it to an email'."},
+    p4:{plain:"Employability support connects a person's present strengths and barriers to a believable next step towards work, learning or greater stability.",why:"People sharing the same destination may need very different routes. A useful programme responds to the person rather than marching everyone through identical worksheets.",steps:[["Listen","Understand the person's situation and aim."],["Map","Identify strengths, barriers and evidence."],["Choose","Agree one realistic next destination."],["Build","Practise the skills and actions it requires."],["Review","Use evidence to adjust the route."]],worked:"One participant needs recent work evidence; another first needs a safe email account and confidence completing forms. Both want employment, but their immediate learning plans should not be twins."},
+    p5:{plain:"A workflow is the complete journey of a piece of work: who starts it, what information moves, where decisions happen, and how it ends.",why:"Problems often hide between steps—waiting, duplicated entry, unclear ownership and exceptions—not inside the individual tools.",steps:[["Start","Choose one real trigger."],["Trace","Follow every action and hand-off."],["Mark","Add waiting, decisions and failures."],["Diagnose","Find friction and its cause."],["Redesign","Test the smallest useful change."]],worked:"Map a referral from first contact to confirmed appointment. Include unanswered calls, missing consent and who chases information; otherwise you have mapped the imaginary polite version."},
+    p6:{plain:"Automation lets a system perform a repeatable action after a defined trigger. It is useful when the rule is stable and exceptions have somewhere safe to go.",why:"Automating a confused process makes mistakes faster. The human decision, recovery path and data risk must be clear before choosing software.",steps:[["Trigger","State exactly what starts the automation."],["Inputs","List the information it needs."],["Rules","Write the decision in plain language."],["Output","Define the visible result."],["Exception","Route uncertainty to a named person."]],worked:"When a complete booking form arrives, create a record and confirmation draft. If consent or contact details are missing, stop and flag it for a person rather than inventing an answer."},
+    p7:{plain:"Measurement helps you decide whether work happened, whether it helped and what should change next.",why:"Counts show activity; outcomes show change. Neither is useful unless someone knows what decision the information will support.",steps:[["Question","Name the decision you need to make."],["Indicator","Choose evidence that answers it."],["Baseline","Record the starting point."],["Collect","Use the lightest reliable method."],["Learn","Interpret and act on the result."]],worked:"Attendance tells you reach. An independent end task tells you whether people can now use the skill. Together they explain more than a decorative satisfaction score."},
+    p8:{plain:"Responsible data practice means knowing why information is collected, limiting who can use it, keeping it accurate and deleting it when it is no longer needed.",why:"Personal data can harm people when it is excessive, exposed, misunderstood or retained forever. Convenience is not automatically a lawful purpose.",steps:[["Purpose","State why the data is necessary."],["Minimum","Collect only what supports that purpose."],["Access","Limit and record who can see it."],["Retention","Set review and deletion dates."],["Respond","Plan for errors, requests and breaches."]],worked:"A sign-in sheet needs a purpose and retention period. A mystery spreadsheet copied into three folders is not a filing system; it is a future incident wearing office clothes."},
+    p9:{plain:"Facilitation is the deliberate shaping of a space where people can participate, learn and remain safe.",why:"Clear structure reduces anxiety and protects time. Good facilitation balances warmth with boundaries and includes a route for disclosures or conflict.",steps:[["Contract","Explain purpose, timing and boundaries."],["Invite","Use more than one way to participate."],["Notice","Watch energy, access and power."],["Respond","Name problems calmly and specifically."],["Close","Summarise, check safety and give next steps."]],worked:"If one person dominates, thank them, restate the need for all voices, invite written or paired responses, and return later. Boundaries are not an act of war."},
+    p10:{plain:"Digital strategy connects organisational goals to deliberate choices about people, processes, information and technology.",why:"Buying a tool is not a strategy. Sustainable change needs ownership, capacity, measures, support and an exit route.",steps:[["Outcome","Name the organisational change wanted."],["Reality","Assess people, process and information."],["Options","Compare tool and non-tool responses."],["Plan","Assign ownership, cost and support."],["Review","Measure value and stop what does not help."]],worked:"Instead of 'we need a CRM', begin with 'referrals are lost and ownership is invisible'. A clearer process may be needed before—or instead of—new software."},
+    p11:{plain:"Discovery is a short evidence-gathering phase used to understand a problem before recommending a solution.",why:"People often request a familiar solution before the real cause is known. Discovery protects time and money by testing assumptions.",steps:[["Frame","Write the problem as a question."],["Observe","Study recent real examples."],["Gather","Speak to different roles and inspect artefacts."],["Synthesize","Separate evidence from inference."],["Recommend","Offer prioritised choices and first steps."]],worked:"A request for automation may conceal inconsistent inputs and no agreed owner. Discover that before purchasing a beautifully efficient catastrophe."},
+    p12:{plain:"A reusable resource helps someone complete a real task without the original teacher standing beside them.",why:"Clarity is shown by successful use, not by how polished the page looks. Resources also need ownership and review because interfaces change.",steps:[["User","Name who needs it and in what moment."],["Job","Choose one primary task."],["Route","Write the shortest complete sequence."],["Recovery","Explain common mistakes and alternatives."],["Test","Watch use without coaching, then revise."]],worked:"A guide to attaching a file should explain where downloads usually go, how to recognise the correct file and what to do after choosing the wrong one."}
+  };
+
+  const PROFESSIONAL_TO_CURIOSITY = {
+    p1:["vi-1","vi-2","vi-3"], p2:["i-2","i-4"], p3:["i-1","i-3"], p4:["i-4","v-4"],
+    p5:["iii-1","iii-2"], p6:["iii-2","vi-4"], p7:["iii-3","v-2"], p8:["iii-4","vi-5"],
+    p9:["i-4","i-6"], p10:["iii-1","iii-5"], p11:["i-1","v-2"], p12:["i-1","iii-6"]
+  };
+
+  const FACULTY_FOUNDATIONS = {
+    "Human Nature":"Begin with a simple idea: a mind is not a neutral camera. It notices, predicts, remembers and decides using limited information. As you read, keep separating what happened from the story a mind built about it.",
+    "Living Worlds":"Begin by locating the living system: what organisms are involved, what they need, how energy or information moves, and what changes when one relationship is disturbed.",
+    "Hidden Systems":"A system is a group of connected parts whose behaviour emerges from their relationships. Look for inputs, rules, incentives, feedback loops, delays, power and unintended consequences.",
+    "Curious Histories":"History is an evidence-based argument about change over time. Ask who produced each source, what survived, whose voice is missing and why a familiar story became dominant.",
+    "Big Questions":"A big question rarely has one testable answer. First define the important words, then separate facts, values and assumptions before comparing positions.",
+    "Artificial Intelligence":"Artificial intelligence is a family of computer methods that find patterns and use them to classify, predict or generate outputs. It does not understand or verify its answer in the human sense; people remain responsible for how it is used."
+  };
+
+  function renderPathwayDiagram(steps) {
+    return `<div class="pathway-flow" role="img" aria-label="${escapeHtml(steps.map(step => step[0]).join(" then "))}">${steps.map(step => `<div class="pathway-step"><strong>${escapeHtml(step[0])}</strong><span>${escapeHtml(step[1])}</span></div>`).join("")}</div>`;
+  }
+
+  function curiosityFoundation(course) {
+    const foundation = FACULTY_FOUNDATIONS[course.faculty] || "Start with the central idea, then connect it to one example you can explain in your own words.";
+    const ai = course.faculty === "Artificial Intelligence";
+    return `<section class="learning-pathway"><p class="eyebrow">Start here · no prior knowledge assumed</p><h2>${ai ? "The AI learning pathway" : "A guided route into this lesson"}</h2><p>${escapeHtml(foundation)}</p>${ai ? renderPathwayDiagram([["Question","Name what you want the system to do."],["Data","Ask what examples or information shaped it."],["Model","See how patterns become predictions or generated output."],["Check","Compare the output with evidence and context."],["Use","Decide the human action, limit and accountability."]]) : `<div class="lesson-ladder"><div class="lesson-rung"><strong>1. Notice the central question</strong><p>${escapeHtml(course.question)}</p></div><div class="lesson-rung"><strong>2. Learn the key idea</strong><p>Read one section at a time. After each, say it back without the specialist words.</p></div><div class="lesson-rung"><strong>3. Find an example</strong><p>Use something ordinary, recent and specific. If you can explain the idea through that example, it has begun to stick.</p></div><div class="lesson-rung"><strong>4. Test the edge</strong><p>Ask when the explanation works, when it fails and what evidence would change your mind.</p></div></div>`}${ai ? `<div class="worked-example"><strong>Worked example: asking an AI to create a workshop</strong><p>You define the audience and outcome; source notes supply reliable facts; the model generates a draft by predicting useful language; you check accuracy, accessibility, tone and missing context; only then do you decide what becomes the real workshop. The pathway is not “ask AI → trust answer”. It is “human goal → prepared evidence → model draft → human verification → accountable use”.</p></div>` : ""}<p><strong>Before moving on:</strong> Write one sentence beginning “I think this lesson is really about…” It can be provisional. Learning is allowed to arrive wearing slippers.</p></section>`;
+  }
+
   function questionBreakdown(kind, module, text) {
     const firstTask = module.tasks?.[0] || "choose one small starting action";
     if (kind === "output") return {means:"Make one practical item you could genuinely use, rather than writing an essay about the topic.",steps:`Start with “${firstTask}”. Then use the pathway principles to draft the item, check it and improve it once.`,enough:"A rough but usable first version is enough. It does not need to be polished or complete."};
@@ -593,7 +645,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   let driveSyncBusy = false;
 
   const defaults = {
-    version: 3.2,
+    version: 3.3,
     studyMode: "curiosity",
     currentView: "dashboard",
     currentCourse: null,
@@ -1244,6 +1296,8 @@ if(__exports != exports)module.exports = exports;return module.exports}));
   function renderProfessionalCourse() {
     const module = PROFESSIONAL_MODULES.find(item => item.id === state.currentProfessional) || PROFESSIONAL_MODULES[0];
     const extras = PROFESSIONAL_EXTRAS[module.id];
+    const foundation = PROFESSIONAL_FOUNDATIONS[module.id];
+    const curiosityLinks = (PROFESSIONAL_TO_CURIOSITY[module.id] || []).map(id => courseById[id]).filter(Boolean);
     state.currentProfessional = module.id;
     const p = professionalProgressFor(module.id);
     p.lastVisited = new Date().toISOString();
@@ -1256,7 +1310,11 @@ if(__exports != exports)module.exports = exports;return module.exports}));
       <div class="professional-layout">
         <article class="reading-panel">
           ${renderInkToolbar(`professional:${module.id}:reading`, true)}
-          <div class="annotation-stage ${inkState(`professional:${module.id}:reading`, true).enabled ? "ink-enabled" : ""} ${inkState(`professional:${module.id}:reading`, true).visible ? "" : "ink-hidden"}" data-ink-container="professional:${module.id}:reading"><div class="annotation-content"><p class="eyebrow">Core reading</p><h2>Learn the working principles</h2><p class="lede">${escapeHtml(module.summary)}</p>${module.lessons.map((lesson,index) => `<section class="lesson-block"><p class="eyebrow">Lesson ${index + 1} of ${module.lessons.length}</p><h3>${escapeHtml(lesson.title)}</h3><p>${escapeHtml(lesson.text)}</p>${index === 0 ? `<div class="lesson-detail"><p><strong>A real example</strong></p><p>${escapeHtml(extras.example)}</p></div>` : ""}${index === 1 ? `<div class="lesson-detail"><p><strong>Try this while you learn</strong></p><p>${escapeHtml(extras.practice)}</p></div>` : ""}${index === 2 ? `<div class="lesson-detail"><p><strong>Pause and check</strong></p><p>Can you explain this principle using one real situation, and name what you would do differently because of it?</p>${renderBreakdown(`lesson-${index}`, module, lesson.title)}</div>` : ""}</section>`).join("")}<section><p class="eyebrow">Further learning</p><h2>Useful, trustworthy resources</h2><p>Choose one resource that fills a gap; opening every tab is not a personality requirement.</p><div class="professional-resources">${extras.resources.map(resource => `<a class="resource" href="${escapeHtml(resource[1])}" target="_blank" rel="noopener noreferrer"><span class="resource-type">Read</span><strong>${escapeHtml(resource[0])}</strong><span aria-hidden="true">↗</span></a>`).join("")}</div></section></div><canvas class="ink-canvas annotation-canvas" data-ink-surface="professional:${module.id}:reading" aria-label="Professional reading annotation layer"></canvas></div>
+          <div class="annotation-stage ${inkState(`professional:${module.id}:reading`, true).enabled ? "ink-enabled" : ""} ${inkState(`professional:${module.id}:reading`, true).visible ? "" : "ink-hidden"}" data-ink-container="professional:${module.id}:reading"><div class="annotation-content"><p class="eyebrow">Core reading</p><h2>Learn the working principles</h2><p class="lede">${escapeHtml(module.summary)}</p>
+          <section class="learning-pathway"><p class="eyebrow">Foundation · begin here</p><h2>What this means in ordinary language</h2><p>${escapeHtml(foundation.plain)}</p><h3>Why it matters</h3><p>${escapeHtml(foundation.why)}</p><h3>The pathway, fully written out</h3>${renderPathwayDiagram(foundation.steps)}<div class="worked-example"><strong>Worked example</strong><p>${escapeHtml(foundation.worked)}</p></div><p><strong>Check before continuing:</strong> Can you name the starting point, the human decision and the finished result? If not, reread only the diagram—not the entire universe.</p></section>
+          ${module.lessons.map((lesson,index) => `<section class="lesson-block"><p class="eyebrow">Lesson ${index + 1} of ${module.lessons.length}</p><h3>${escapeHtml(lesson.title)}</h3><p>${escapeHtml(lesson.text)}</p>${index === 0 ? `<div class="lesson-detail"><p><strong>Another real example</strong></p><p>${escapeHtml(extras.example)}</p></div>` : ""}${index === 1 ? `<div class="lesson-detail"><p><strong>Try this while you learn</strong></p><p>${escapeHtml(extras.practice)}</p></div>` : ""}${index === 2 ? `<div class="lesson-detail"><p><strong>Pause and check</strong></p><p>Can you explain this principle using one real situation, and name what you would do differently because of it?</p>${renderBreakdown(`lesson-${index}`, module, lesson.title)}</div>` : ""}</section>`).join("")}
+          ${curiosityLinks.length ? `<section class="curiosity-bridge"><p class="eyebrow">Further, freer learning</p><h2>Follow this into Curiosity Mode</h2><p>These lessons explore the ideas behind the professional skill without requiring a workplace output.</p>${curiosityLinks.map(course => `<button class="btn" data-curiosity-course="${course.id}">${escapeHtml(course.code)} · ${escapeHtml(course.title)}</button>`).join(" ")}</section>` : ""}
+          <section><p class="eyebrow">Further learning</p><h2>Useful, trustworthy resources</h2><p>Choose one resource that fills a gap; opening every tab is not a personality requirement.</p><div class="professional-resources">${extras.resources.map(resource => `<a class="resource" href="${escapeHtml(resource[1])}" target="_blank" rel="noopener noreferrer"><span class="resource-type">Read</span><strong>${escapeHtml(resource[0])}</strong><span aria-hidden="true">↗</span></a>`).join("")}</div></section></div><canvas class="ink-canvas annotation-canvas" data-ink-surface="professional:${module.id}:reading" aria-label="Professional reading annotation layer"></canvas></div>
           <section class="card work-output"><p class="eyebrow">Apply it</p><h2>Build the real output</h2><div class="question-wrap"><p>${escapeHtml(module.outputPrompt)}</p>${renderBreakdown("output", module, module.outputPrompt)}</div><div class="field"><label for="professionalOutput">Your working output</label><textarea id="professionalOutput" data-professional-field="output" placeholder="Type here, dictate, or use Apple Pencil Scribble…">${escapeHtml(p.output)}</textarea></div></section>
           <section class="card" style="margin-top:18px"><p class="eyebrow">CPD evidence</p><h2>Record what changed</h2><div class="question-wrap"><p>${escapeHtml(module.evidencePrompt)}</p>${renderBreakdown("evidence", module, module.evidencePrompt)}</div><div class="field"><label for="professionalEvidence">Evidence and reflection</label><textarea id="professionalEvidence" data-professional-field="evidence">${escapeHtml(p.evidence)}</textarea></div><div class="field" style="margin-top:14px"><label for="professionalNotes">Notes, examples and connections</label><textarea id="professionalNotes" data-professional-field="notes">${escapeHtml(p.notes)}</textarea></div>${renderProfessionalInkPad(module.id)}</section>
         </article>
@@ -1398,7 +1456,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
 
   function renderCourseTab(course, progress, tab) {
     if (tab === "lecture") {
-      return `<p class="eyebrow">${course.code} · Core lecture</p>${markdown(course.lecture)}<div class="button-row"><button class="btn btn-primary" data-mark-and-tab="lecture:archive">Mark lecture read & continue</button></div>`;
+      return `${curiosityFoundation(course)}<p class="eyebrow">${course.code} · Core lecture</p>${markdown(course.lecture)}<div class="worked-example"><strong>Make the idea yours</strong><p>Choose one term from this lecture. Explain it as if you were speaking to somebody who has never studied the subject, then give one everyday example. If specialist language sneaks back in wearing a fake moustache, simplify it again.</p></div><div class="button-row"><button class="btn btn-primary" data-mark-and-tab="lecture:archive">Mark lecture read & continue</button></div>`;
     }
     if (tab === "archive") {
       return `<p class="eyebrow">Archive Room</p>${markdown(course.archive)}<div class="button-row"><button class="btn btn-primary" data-tab="library">Continue to the Grand Library</button></div>`;
@@ -1485,7 +1543,7 @@ if(__exports != exports)module.exports = exports;return module.exports}));
         <div class="card"><p class="eyebrow">Offline</p><h3>Downloaded campus</h3><p class="muted">The 48 course lectures and app interface are included. External video, audio and article links still require internet.</p><button class="btn" data-refresh-cache>Refresh offline copy</button></div>
         <div class="card"><p class="eyebrow">Private records</p><h3>Begin again</h3><p class="muted">This permanently removes local notes, answers and progress from this device. Export first if uncertain.</p><button class="btn" data-reset>Erase local study record</button></div>
       </section>
-      <section class="card" style="margin-top:20px"><h2>What is inside this edition</h2><p>Three study modes · six curiosity faculties · 48 complete course portals · 12 expanded Academy pathways · the AI Librarian · custom professional pathways · universal search and bookmarks · integrated reading, plain-language question breakdowns, trusted resources, tasks, work outputs, neatened full-page Pencil notes, straight-line highlighting, sticky notes, Curiosity Cabinet, Commonplace Book, Academy record, offline caching, verified backup and restore · Google Drive cross-device sync with daily recovery copies.</p><p class="muted small">Lantern Academy release 3.2 · The Clearer Path. Local-first by design: losing a connection never locks you out of your work.</p></section>
+      <section class="card" style="margin-top:20px"><h2>What is inside this edition</h2><p>Three study modes · six curiosity faculties · 48 guided course portals · 12 fully explained professional pathways · connected curiosity routes · the AI Librarian · custom professional pathways · universal search and bookmarks · integrated reading, plain-language question breakdowns, worked examples, pathway diagrams, trusted resources, tasks, work outputs, Pencil-only ink while annotating, neatened notes, straight-line highlighting, sticky notes, Curiosity Cabinet, Commonplace Book, Academy record, offline caching, verified backup and restore · Google Drive cross-device sync with daily recovery copies.</p><p class="muted small">Lantern Academy release 3.3 · The Guided Lantern. Local-first by design: losing a connection never locks you out of your work.</p></section>
     </div>`;
   }
 
@@ -1621,13 +1679,13 @@ if(__exports != exports)module.exports = exports;return module.exports}));
         if (event.pointerType === "touch") return;
         const setting = inkState(canvas.dataset.inkSurface, canvas.classList.contains("annotation-canvas"));
         if (canvas.classList.contains("annotation-canvas") && !setting.enabled) return;
-        event.preventDefault(); canvas.setPointerCapture?.(event.pointerId);
+        event.preventDefault(); event.stopPropagation(); canvas.setPointerCapture?.(event.pointerId);
         stroke = { tool: setting.tool, colour: setting.colour, smoothing: setting.smoothing !== false, points: [point(event)] };
         inkRecords(canvas.dataset.inkSurface).push(stroke); drawInk(canvas);
       });
       canvas.addEventListener("pointermove", event => {
         if (!stroke || (event.buttons === 0 && event.pointerType !== "pen")) return;
-        event.preventDefault();
+        event.preventDefault(); event.stopPropagation();
         stroke.points.push(point(event));
         stroke.straight = false;
         lastMoveAt = Date.now();
@@ -1660,7 +1718,8 @@ if(__exports != exports)module.exports = exports;return module.exports}));
           help.classList.remove("ink-straightening");
         }
       };
-      canvas.addEventListener("pointerup", finish); canvas.addEventListener("pointercancel", finish);
+      canvas.addEventListener("pointerup", event => { if (event.pointerType !== "touch") { event.preventDefault(); event.stopPropagation(); } finish(); });
+      canvas.addEventListener("pointercancel", finish);
     });
   }
 
@@ -1743,6 +1802,13 @@ if(__exports != exports)module.exports = exports;return module.exports}));
 
     const professionalButton = event.target.closest("[data-professional]");
     if (professionalButton) return openProfessional(professionalButton.dataset.professional);
+    const curiosityCourseButton = event.target.closest("[data-curiosity-course]");
+    if (curiosityCourseButton) {
+      state.studyMode = "curiosity";
+      document.querySelectorAll("[data-mode]").forEach(button => button.classList.toggle("active", button.dataset.mode === "curiosity"));
+      saveState("Opened the connected Curiosity lesson.");
+      return openCourse(curiosityCourseButton.dataset.curiosityCourse);
+    }
 
     const customButton = event.target.closest("[data-custom-project]");
     if (customButton) {
